@@ -143,7 +143,7 @@ to see what you can set. The following sections describe a few handy flags.
 
 Use `--credentials-file` and `--token-file` to point `goto-meet` to different files than `credentials.json`
 and `token.json` in the default location `~/.goto-meet/`. For example you could generate different configs
-for different users and have several `goto-meet` processes to poll for different users.
+for different Google accounts and run several `goto-meet` processes to poll their calendars.
 
 ### Calendar and polling
 
@@ -159,7 +159,13 @@ for different users and have several `goto-meet` processes to poll for different
 - `--max-results-per-poll` limits the number of fetched entries during each poll. The default is 50, which assumes
   that you won't have more than 50 events within the next hour.
 
-### Automatic startup
+### Debugging
+
+`goto-meet` writes its actions to a logfile, which is by default `/tmp/goto-meet.log`. Each time that `goto-meet`
+starts, the log is overwritten. Use this flag to change the logfile location, or use `--log=''` to see
+the log in the terminal.
+
+## Automatic startup
 
 The sources contain a file `nl.kubat.goto-meet.plist`. If you like `goto-meet` and want it running in the background:
 
@@ -174,8 +180,14 @@ ps ax | grep goto-meet   # one process must be running
 cat /tmp/goto-meet.log   # the log must now exist
 ```
 
-### Debugging
+If you don't like MacOSX's `launchd` then you can just as easily fire up `goto-meet` by hand:
 
-`goto-meet` writes its actions to a logfile, which is by default `/tmp/goto-meet.log`. Each time that `goto-meet`
-starts, the log is overwritten. Use this flag to change the logfile location, or use `--log=''` to see
-the log in the terminal.
+```shell
+nohup goto-meet &  # fire up goto-meet as a background process
+```
+
+Or you can fire up `goto-meet` after each reboot by adding the following line to your crontab:
+
+```shell
+@reboot /usr/local/bin/goto-meet &
+```
