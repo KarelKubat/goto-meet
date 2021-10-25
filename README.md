@@ -1,12 +1,29 @@
 # goto-meet
 
-`goto-meet` is a simple program that polls your Google Calendar and displays notifications of upcoming meetings
+`goto-meet` is a command-line program that polls your Google Calendar and displays notifications of upcoming meetings
 where you can join a video conference. The notifications have 3 buttons: one to join the video meeting, one
 to see (or edit) the calendar entry, and one to ignore the notification.
 
-# Preparation
+Current limitations are the following:
 
-## Downloads
+- `goto-meet` expects that you have a Google Chrome browser.
+- Notifications currently only work on MacOSX, because they use the `osascript` utility to render popups.
+
+This version of `goto-meet` only scratches my own itch, but I may implement support for other browsers or
+notifications as the need arises. Pull requests are of course always welcome. The wishlist, in abbreviated form:
+
+- Add unit tests and make `goto-meet` a complete package
+- The MacOSX notifications are a bit clunky. Is there a nicer way?
+- If notifications allow this: can the browser be instructed to open on a given monitor?
+- Implement notifications for other OSses.
+- Add a method to prevent double invocations on non-MacOSX systems. Maybe `goto-meet` must become aware of its own
+  PID file.
+
+Questions / remarks? You can find me on karel@kubat.nl.
+
+## Preparation
+
+### Downloading and installing
 
 - Download the goto-meet sources
 - In the downloaded location, run `go mod init`
@@ -17,7 +34,14 @@ go get -u google.golang.org/api/calendar/v3
 go get -u golang.org/x/oauth2/google
 ```
 
-## Default location for configs
+- In the location where you put the `goto-meet` sources, run:
+
+```shell
+go build goto-meet.go              # build the binary goto-meet
+sudo mv goto-meet /usr/local/bin/  # or use another appropriate location along your $PATH
+```
+
+### Default location for configs
 
 `goto-meet` will expect its configuration to access the Google Calendar API in a directory `~/.goto-meet/`
 (unless of course you use flags to point to different config files). 
@@ -28,7 +52,7 @@ mkdir ~/.goto-meet       # create dir
 chmod 700 ~/.goto-meet   # make it readable only by this user
 ```
 
-## Enable your Google Calendar API
+### Enabling your Google Calendar API
 
 The following steps are required just once. These instructions were written in October 2021 and may or may not still
 be accurate as you read this text; Google may well have modified their website layout.
@@ -58,33 +82,62 @@ be accurate as you read this text; Google may well have modified their website l
 - Click `Create` and download the JSON file. It will be named something like `client_secret*.json` and will be in
   your download folder.
 - Rename this file to `~/.goto-meet/credentials.json`:
-  ```
+
+```shell
   # Just an example, your downloads folder may be something different and make sure
   # to point to the downloaded `client_secret*` file.
   mv ~/Downloads/client_secret*json ~/.goto-meet/credentials.json`
-  ```
+```
 
-## Enable goto-meet
+### Authorizing goto-meet
 
 These steps are required only once to allow `goto-meet` to consume the Google Calendar API.
 Run `goto-meet`:
 
-```
-go build goto-meet.go  # build the binary
-./goto-meet            # fire it up
+```shell
+goto-meet            # fire it up
 ```
 
-This will render a message that you should visit a location on accounts.google.com to fetch a code. Copy/paste the 
-shown link in your browser. Google will ask you whether you want to trust this `goto-meet` desktop app. Agree, and copy the generated code.
+This will render a message that you should visit a location on accounts.google.com to fetch a code. Copy/paste the
+shown link to your browser. Google will ask you whether you want to trust this `goto-meet` desktop app. Agree, and copy the generated code.
 
 Back in the terminal, paste the code to the waiting `goto-meet` process and hit enter. The access code will be
 saved as `~/.goto-meet/token.json`. `goto-meet` is now happily polling your calendar, but you can for now kill
 the process and read on. Just hit ^C.
 
-# Running it
+### First real try
+
+For a testrun, try:
+
+```shell
+goto-meet --log='' --loops=3 --poll-interval=5s --starts-in=48h --look-ahead=72h
+```
+
+This will instruct `goto-meet` to do 3 polls, each 5 seconds apart. It will consider all events with a video
+meeting within the next 3 days (72h) and will show a notification for each event that's starting within
+the next 2 days (48h)
+This of course assumes that you have a video meeting within that period. Adjust the flags `--look-ahead` and
+`--starts-in` accordingly, until `goto-meet` finds something worth while.
+
+NOTE: Durations are given as a number, followed by a prefix, such as `10s` or `20m` or `3h`. There is no suffix for
+days, just use the number of days times 24, with `h` as the suffix. Different specifiers may also be
+combined, as in `23h59m30s`, which is 30 seconds short of one full day.
+
+The result should be an alert showing three buttons:
+
+- *Join*, to open the video meeting link,
+- *Calendar*, to open your calendar with the event,
+- *Skip*, to dismiss the notification.
+
+## Running it
 
 `goto-meet` tries to use "sane" defaults, but you can always use flags to modify its behavior. Try
-`goto-meet --help` to se what you can set. The following sections describe a few handy flags.
+
+```shell
+goto-meet --help
+```
+
+to see what you can set. The following sections describe a few handy flags.
 
 ### Location of the config files
 
@@ -105,6 +158,21 @@ for different users and have several `goto-meet` processes to poll for different
 `--look-ahead`).
 - `--max-results-per-poll` limits the number of fetched entries during each poll. The default is 50, which assumes
   that you won't have more than 50 events within the next hour.
+
+### Automatic startup
+
+The sources contain a file `nl.kubat.goto-meet.plist`. If you like `goto-meet` and want it running in the background:
+
+- Copy the file to `~/Library/LaunchAgents/`
+- Edit `~/Library/LaunchAgents/nl.kubat.goto-meet.plist` and make sure that the `ProgramArguments` array has all the
+  flags that you want to set, and that the program is expected in the right location (`/usr/local/bin/` is assumed).
+- Run `launchctl load ~/Library/LaunchAgents/nl.kubat.goto-meet.plist`.
+- Check that all worked:
+
+```shell
+ps ax | grep goto-meet   # one process must be running
+cat /tmp/goto-meet.log   # the log must now exist
+```
 
 ### Debugging
 
