@@ -27,15 +27,23 @@ var (
 			tpl: template.Must(template.New("macos_osascript").Parse(`
 display dialog ("{{.Title}}") buttons {"Join", "Calendar", "Skip"} giving up after {{.VisibilitySec}}
 if button returned of result = "Join" then
+  {{if .Browser }}
   tell application "{{.Browser}}"
     activate
     open location "{{.JoinLink}}"
   end tell
+  {{ else }}
+  open location "{{.JoinLink}}"
+  {{ end }}
 else if button returned of result = "Calendar" then
+  {{if .Browser }}
   tell application "{{.Browser}}"
     activate
     open location "{{.CalendarLink}}"
   end tell
+  {{ else }}
+  open location "{{.CalendarLink}}"
+  {{ end }}
 end if
 `)),
 		},

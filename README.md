@@ -161,7 +161,9 @@ goto-meet --help
 ### UI
 
 - `--onscreen-sec` defines how long a popup should remain visible. The default is 120.
-- `--browser` identifies your favorite browser. The default is `Google Chrome`.
+- `--browser` identifies your favorite browser. The default is an empty string, which calls your default
+  browser. This flag may be set to force accepting video calls in a different browser than your default one,
+  e.g., on a different monitor.
 
 ### Location of the config files
 
@@ -209,8 +211,9 @@ arises. Pull requests are of course always welcome. The wishlist, in abbreviated
 
 - Add unit tests and make `goto-meet` a complete package
 - The MacOSX notifications are a bit clunky. Is there a nicer way?
-- If notifications allow this: can the browser be instructed to open on a given monitor?
+- If notifications allow this: can the browser be instructed to open on a given monitor? `goto-meet` supports a
+  work-around to force opening video meetings by another browser than your default one, but this still requires
+  you to have two browsers open.
 - Implement notifications for other OSses.
 - Add a method to prevent double invocations on non-MacOSX systems. Maybe `goto-meet` must become aware of its own
   PID file.
-
