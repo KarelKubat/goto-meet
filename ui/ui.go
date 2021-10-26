@@ -27,12 +27,12 @@ var (
 			tpl: template.Must(template.New("macos_osascript").Parse(`
 display dialog ("{{.Title}}") buttons {"Join", "Calendar", "Skip"} giving up after {{.VisibilitySec}}
 if button returned of result = "Join" then
-  tell application "Google Chrome"
+  tell application "{{.Browser}}"
     activate
     open location "{{.JoinLink}}"
   end tell
 else if button returned of result = "Calendar" then
-  tell application "Google Chrome"
+  tell application "{{.Browser}}"
     activate
     open location "{{.CalendarLink}}"
   end tell
@@ -47,6 +47,7 @@ type Opts struct {
 	Name          string
 	StartsIn      time.Duration
 	VisibilitySec int
+	Browser       string
 }
 
 // Notifier wraps the applicable notification configuration.
@@ -77,6 +78,7 @@ func New(opts *Opts) (*Notifier, error) {
 type temp struct {
 	Title         string // event title
 	VisibilitySec int    // # secs on screen
+	Browser       string // browser to fire up
 	JoinLink      string // link to join the meet
 	CalendarLink  string // link to see the event on the calendar
 }
@@ -108,6 +110,7 @@ func (n *Notifier) Schedule(it *item.Item) {
 		t := &temp{
 			Title:         it.Title,
 			VisibilitySec: n.opts.VisibilitySec,
+			Browser:       n.opts.Browser,
 			JoinLink:      it.JoinLink,
 			CalendarLink:  it.CalendarLink,
 		}
@@ -116,6 +119,7 @@ func (n *Notifier) Schedule(it *item.Item) {
 			log.Printf("WARNING: cannot execute template: %v", err)
 			return
 		}
+		log.Printf("template: %v", buf.String())
 		cmd := exec.Command(n.config.args[0], n.config.args[1:]...)
 		stdin, err := cmd.StdinPipe()
 		if err != nil {

@@ -32,6 +32,7 @@ var (
 	// How to notify the user
 	notificationTypeFlag = flag.String("notification-type", "macos_osascript", "type of notifications to generate")
 	onscreenSecFlag      = flag.Int("onscreen-sec", 120, "number of seconds to keep a notification visible")
+	browserFlag          = flag.String("browser", "Google Chrome", "browser to activate for calendar links")
 
 	// General
 	loopsFlag    = flag.Int("loops", 0, "polling loops to execute before stopping, 0 means forever (mainly for debugging)")
@@ -65,6 +66,7 @@ func main() {
 		Name:          *notificationTypeFlag,
 		StartsIn:      *startsInFlag,
 		VisibilitySec: *onscreenSecFlag,
+		Browser:       *browserFlag,
 	})
 	if err != nil {
 		log.Fatal(err)
