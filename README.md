@@ -1,31 +1,32 @@
 # goto-meet
 
-`goto-meet` is a command-line program that polls your Google Calendar and displays notifications of upcoming meetings
-where you can join a video conference. The notifications have 3 buttons: one to join the video meeting, one
-to see (or edit) the calendar entry, and one to ignore the notification.
+**`goto-meet` is a command-line program that polls your Google Calendar and displays notifications of upcoming meetings
+containing a link to a video conference. The notifications have 3 buttons: one to join the video meeting, one
+to see (or edit) the calendar entry, and one to ignore the notification.**
 
-Current limitations are the following:
+Like many similar utilities, `goto-meet` was born during the COVID19 lockdown period when meetings no longer
+occurred in person and everything was via video chat. I wanted to have a straight forward notification system
+that would pop up just prior to a video call, where I could click a *Join* button and be done with it --
+ as opposed to firing up my calendar, searching for the event, and clicking a meeting button. `goto-meet` does
+ exactly that. For any upcoming event, it will try to extract a video meet link and if found, will show a
+ popup. The video meet link can be:
 
-- `goto-meet` expects that you have a Google Chrome browser.
-- Notifications currently only work on MacOSX, because they use the `osascript` utility to render popups.
+- The meeting link in the calendar event (called the `HangoutLink` in the Calendar API)
+- Any link in the event's title or description that points to a "known" video service (see `item/item.go` in
+  the sources).
 
-This version of `goto-meet` only scratches my own itch, but I may implement support for other browsers or
-notifications as the need arises. Pull requests are of course always welcome. The wishlist, in abbreviated form:
+Currently the limitation is that notifications currently only work on MacOSX, because they use the `osascript`
+utility to render popups.
 
-- Add unit tests and make `goto-meet` a complete package
-- The MacOSX notifications are a bit clunky. Is there a nicer way?
-- If notifications allow this: can the browser be instructed to open on a given monitor?
-- Implement notifications for other OSses.
-- Add a method to prevent double invocations on non-MacOSX systems. Maybe `goto-meet` must become aware of its own
-  PID file.
-
-Questions / remarks? You can find me on karel@kubat.nl.
+**Questions / remarks? You can find me on karel@kubat.nl.**
 
 ## Preparation
 
-### Downloading and installing
+### Downloading, compiling and installing
 
-- Download the goto-meet sources
+You'll need a Go compiler and support to build your own binary.
+
+- Download the `goto-meet` sources
 - In the downloaded location, run `go mod init`
 - Fetch required libraries:
 
@@ -33,8 +34,6 @@ Questions / remarks? You can find me on karel@kubat.nl.
 go get -u google.golang.org/api/calendar/v3
 go get -u golang.org/x/oauth2/google
 ```
-
-- In the location where you put the `goto-meet` sources, run:
 
 ```shell
 go build goto-meet.go              # build the binary goto-meet
@@ -54,12 +53,15 @@ chmod 700 ~/.goto-meet   # make it readable only by this user
 
 ### Enabling your Google Calendar API
 
-The following steps are required just once. These instructions were written in October 2021 and may or may not still
-be accurate as you read this text; Google may well have modified their website layout.
+The following steps are required just once. The purpose is to enable the Google Cloud API for your Google
+account.
+
+These instructions were written in October 2021 and may or may not still be accurate as you read this
+text; Google may well have modified their website layout.
 
 - Navigate to https://console.cloud.google.com/ and log in.
-- Create a new project, and name it e.g. `CalendarAPI`. You may need to explicitly switch to this project if you
-  have already other active projects.
+- Create a new project, and name it e.g. `CalendarAPI`. If you already have Google cloud projects you can also
+  put this API under the umbrella of an existing one, doesn't matter.
 - On the card `Getting Started`, click `Explore and enable APIs`.
 - Click the button `+ ENABLE APIS AND SERVICES`.
 - In the row `Google Workspace` click `Google Calendar API`.
@@ -91,19 +93,23 @@ be accurate as you read this text; Google may well have modified their website l
 
 ### Authorizing goto-meet
 
-These steps are required only once to allow `goto-meet` to consume the Google Calendar API.
+These steps are required only once to allow `goto-meet` to consume the Google Calendar API that you enabled
+in the step above.
+
 Run `goto-meet`:
 
 ```shell
-goto-meet            # fire it up
+goto-meet --loops=1   # goto-meet won't poll repeatedly
 ```
 
-This will render a message that you should visit a location on accounts.google.com to fetch a code. Copy/paste the
-shown link to your browser. Google will ask you whether you want to trust this `goto-meet` desktop app. Agree, and copy the generated code.
+This will show a message that you should visit a location on accounts.google.com to fetch a code.  Leave the
+terminal as-is (waiting for input) and copy/paste the shown link to your browser. Google will ask you whether
+you want to trust this `goto-meet` desktop app. Agree, and copy the generated code.
 
 Back in the terminal, paste the code to the waiting `goto-meet` process and hit enter. The access code will be
-saved as `~/.goto-meet/token.json`. `goto-meet` is now happily polling your calendar, but you can for now kill
-the process and read on. Just hit ^C.
+saved as `~/.goto-meet/token.json`.
+
+If this step fails for some reason, just remove `~/.goto-meet/token.json` and retry.
 
 ### First real try
 
@@ -131,19 +137,12 @@ The result should be an alert showing three buttons:
 
 ## Running it
 
-`goto-meet` tries to use "sane" defaults, but you can always use flags to modify its behavior. Try
+`goto-meet` tries to use "sane" defaults, but you can always use flags to modify its behavior.
+The following sections describe a few handy flags. To see an overview of all flags, try
 
 ```shell
 goto-meet --help
 ```
-
-to see what you can set. The following sections describe a few handy flags.
-
-### Location of the config files
-
-Use `--credentials-file` and `--token-file` to point `goto-meet` to different files than `credentials.json`
-and `token.json` in the default location `~/.goto-meet/`. For example you could generate different configs
-for different Google accounts and run several `goto-meet` processes to poll their calendars.
 
 ### Calendar and polling
 
@@ -158,6 +157,17 @@ for different Google accounts and run several `goto-meet` processes to poll thei
 `--look-ahead`).
 - `--max-results-per-poll` limits the number of fetched entries during each poll. The default is 50, which assumes
   that you won't have more than 50 events within the next hour.
+
+### UI
+
+- `--onscreen-sec` defines how long a popup should remain visible. The default is 120.
+- `--browser` identifies your favorite browser. The default is `Google Chrome`.
+
+### Location of the config files
+
+Use `--credentials-file` and `--token-file` to point `goto-meet` to different files than `credentials.json`
+and `token.json` in the default location `~/.goto-meet/`. For example you could generate different configs
+for different Google accounts and run several `goto-meet` processes to poll their calendars.
 
 ### Debugging
 
@@ -191,3 +201,16 @@ Or you can fire up `goto-meet` after each reboot by adding the following line to
 ```shell
 @reboot /usr/local/bin/goto-meet &
 ```
+
+## TODOs
+
+This version of `goto-meet` only scratches my own itch, but I may implement support for features as the need
+arises. Pull requests are of course always welcome. The wishlist, in abbreviated form:
+
+- Add unit tests and make `goto-meet` a complete package
+- The MacOSX notifications are a bit clunky. Is there a nicer way?
+- If notifications allow this: can the browser be instructed to open on a given monitor?
+- Implement notifications for other OSses.
+- Add a method to prevent double invocations on non-MacOSX systems. Maybe `goto-meet` must become aware of its own
+  PID file.
+
