@@ -43,8 +43,7 @@ func New(event *calendar.Event) (*Item, error) {
 	return out, nil
 }
 
-// sanitize is a helper to make a string suitable for cmdline expansion, as used in the
-// Notifier.
+// sanitize is a helper to make a string suitable for processing in the Notifier.
 func sanitize(s string) string {
 	return strings.Replace(s, "'", "", -1)
 }
@@ -103,7 +102,8 @@ func (i *Item) findStart() error {
 	i.StartsIn = i.Start.Sub(time.Now())
 
 	if i.StartsIn < 0 {
-		log.Printf("negative duration %v for %q; Start=%+v, OriginalStartTime=%+v (%+v)", i.StartsIn, i.Event.Summary, i.Event.Start, i.Event.OriginalStartTime, i.Event)
+		// A (repeating) event started in the past is not an error. We still want the notifier to look at it.
+		log.Printf("negative duration %v for %q; Start=%+v, OriginalStartTime=%+v", i.StartsIn, i.Event.Summary, i.Event.Start, i.Event.OriginalStartTime)
 	}
 	return nil
 }
