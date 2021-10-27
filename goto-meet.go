@@ -16,6 +16,11 @@ import (
 	"goto-meet/ui"
 )
 
+const (
+	// Version of this package, increased upon releasing.
+	version = "0.01"
+)
+
 var (
 	// How to contact Google Calendar
 	tokenFileFlag       = flag.String("token-file", "~/.goto-meet/token.json", "path to JSON configuration with access access_token etc., supports `~/` prefix")
@@ -38,10 +43,16 @@ var (
 	loopsFlag    = flag.Int("loops", 0, "polling loops to execute before stopping, 0 means forever (mainly for debugging)")
 	failuresFlag = flag.Int("failures", 10, "give up after # of consecutive polling errors")
 	logfileFlag  = flag.String("log", "/tmp/goto-meet.log", "log to (over)write, use '' for stdout")
+	versionFlag  = flag.Bool("version", false, "show version and stop")
 )
 
 func main() {
 	flag.Parse()
+
+	if *versionFlag {
+		fmt.Println(version)
+		os.Exit(0)
+	}
 
 	if *logfileFlag != "" {
 		logFile, err := os.Create(*logfileFlag)

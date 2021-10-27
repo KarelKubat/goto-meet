@@ -1,0 +1,36 @@
+#!/usr/bin/env perl
+use strict;
+use File::Basename;
+use File::Spec;
+
+# Purpose: check that the version stated in `goto-meet.go` is up to date with `README.md`.
+
+my $path = File::Spec->rel2abs(__FILE__);
+$path =~ s{tools/consistentversion$}{};
+my $main = "$path/goto-meet.go";
+my $readme = "$path/README.md";
+
+
+my $main_version;
+open(my $if, $main) or die("cannot open $main: $!\n");
+while (my $line = <$if>){
+    chomp($line);
+    next unless ($line =~ m{version =});
+    $line =~ s{version = "}{};
+    $line =~ s{".*}{};
+    $main_version = $line * 1.0; # force number
+    last;
+}
+die("failed to extract version from $main\n") unless ($main_version);
+
+my $readme_version;
+open(my $if, $readme) or die("cannot open $readme: $!\n");
+while (my $line = <$if>) {
+    next unless ($line =~ m{^[0-9.+]});
+    $line =~ s{^[0-9.]}{};
+    $readme_version = $line * 1.0; # force number
+}
+die("failed to extract version from $readme\n") unless ($readme_version);
+
+die("mismatch between version $main_version (from $main) and $readme_version (from $readme)\n")
+  unless ($main_version == $readme_version);

@@ -43,7 +43,7 @@ sudo mv goto-meet /usr/local/bin/  # or use another appropriate location along y
 ### Default location for configs
 
 `goto-meet` will expect its configuration to access the Google Calendar API in a directory `~/.goto-meet/`
-(unless of course you use flags to point to different config files). 
+(unless of course you use flags to point to different config files).
 Create this location:
 
 ```shell
@@ -59,7 +59,7 @@ account.
 These instructions were written in October 2021 and may or may not still be accurate as you read this
 text; Google may well have modified their website layout.
 
-- Navigate to https://console.cloud.google.com/ and log in.
+- Navigate to [console.cloud.google.com](https://console.cloud.google.com/) and log in.
 - Create a new project, and name it e.g. `CalendarAPI`. If you already have Google cloud projects you can also
   put this API under the umbrella of an existing one, doesn't matter.
 - On the card `Getting Started`, click `Explore and enable APIs`.
@@ -121,7 +121,7 @@ goto-meet --log='' --loops=3 --poll-interval=5s --starts-in=48h --look-ahead=72h
 
 This will instruct `goto-meet` to do 3 polls, each 5 seconds apart. It will consider all events with a video
 meeting within the next 3 days (72h) and will show a notification for each event that's starting within
-the next 2 days (48h)
+the next 2 days (48h).
 This of course assumes that you have a video meeting within that period. Adjust the flags `--look-ahead` and
 `--starts-in` accordingly, until `goto-meet` finds something worth while.
 
@@ -217,3 +217,17 @@ arises. Pull requests are of course always welcome. The wishlist, in abbreviated
 - Implement notifications for other OSses.
 - Add a method to prevent double invocations on non-MacOSX systems. Maybe `goto-meet` must become aware of its own
   PID file.
+
+## Version & Release Log (most recent last)
+
+If you find a bug, please report it but also:
+
+- State the version of this tool, you can find it using `goto-meet --version`
+- Include the log, normally found as `/tmp/goto-meet.log`
+- Clearly describe the problem.
+
+Thanks!
+
+```text
+0.01 2021-10 Initial version-stamped release.
+```
