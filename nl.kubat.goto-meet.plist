@@ -10,7 +10,12 @@
 	<string>nl.kubat.goto-meet</string>
 	<key>ProgramArguments</key>
 	<array>
+	    <!-- Make sure you use the right path to the binary. -->
 		<string>/usr/local/bin/goto-meet</string>
+		<!--
+		  Add additional settings here. Example:
+		  <string>--client-timeout</string> <string>30s</string>
+		-->
 	</array>
 	<key>RunAtLoad</key>
 	<true/>

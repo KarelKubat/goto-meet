@@ -184,7 +184,7 @@ The sources contain a file `nl.kubat.goto-meet.plist`. If you like `goto-meet` a
 - Copy the file to `~/Library/LaunchAgents/`
 - Edit `~/Library/LaunchAgents/nl.kubat.goto-meet.plist` and make sure that the `ProgramArguments` array has all the
   flags that you want to set, and that the program is expected in the right location (`/usr/local/bin/` is assumed).
-- Run `launchctl load ~/Library/LaunchAgents/nl.kubat.goto-meet.plist`.
+- Run `launchctl start ~/Library/LaunchAgents/nl.kubat.goto-meet.plist`.
 - Check that all worked:
 
 ```shell
