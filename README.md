@@ -167,8 +167,9 @@ goto-meet --help
   can choose a different one. If you want to poll several calendars, say your default and a calender `office`, then
   you can start two `goto-meet` processes, where one overrides the polled calendar using `--calendar-id=office`.
 - `--starts-in` defines how long before an event a notification should be shown. The default is 1 minute.
-- `--poll-interval` defines how long `goto-meet` waits between calendar polls. The default is 30 minutes; it's
-  assumed that new calendar entries don't appear more frequently.
+- `--poll-interval` defines how long `goto-meet` waits between calendar polls. The default is 10 minutes; it's
+  assumed that new calendar entries don't appear more frequently, and 10 minutes seems to play nicely with a laptop
+  going to sleep, waking up, and not missing upcoming events.
 - `--look-ahead` defines how far ahead `goto-meet` looks when fetching new calendar entries. The default is 1 hour,
   meaning that each 30 minutes (the `--poll-interval`) the events for the next hour are fetched (the
 `--look-ahead`).

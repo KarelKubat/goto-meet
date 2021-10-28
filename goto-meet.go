@@ -30,7 +30,7 @@ var (
 	// Calendar processing
 	calendarIDFlag     = flag.String("calendar-id", "primary", "calendar to inspect, 'primary' is your default calendar")
 	resultsPerPollFlag = flag.Int("max-results-per-poll", 50, "max results to process per calendar poll")
-	pollIntervalFlag   = flag.Duration("poll-interval", time.Minute*30, "wait time between calendar polls")
+	pollIntervalFlag   = flag.Duration("poll-interval", time.Minute*10, "wait time between calendar polls")
 	lookaheadFlag      = flag.Duration("look-ahead", time.Hour*1, "fetch calendar events that start before this duration")
 	startsInFlag       = flag.Duration("starts-in", time.Minute, "how much in advance of a meeting should an alert be generated")
 
