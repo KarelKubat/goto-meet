@@ -168,11 +168,12 @@ goto-meet --help
   your default and a calender `office`, then you can start `goto-meet` with the flag using
   `--calendars=primary,$ID` where `$ID` is the identifier for the office calendar. The ID is unfortunately often a
   generated identifier that you need to look up as follows:
-    - Start `goto-meet --calendars bla --log ''`. This will fail because calendar `bla` doesn't exist, but in the
-      terminal it will show which calendars are available.
-    - Choose one of the available ones. If you can't make a choice, click in the browser on *Options* for the
-      calendar that you are targeting, then *Settings and sharing*, then *Get shareable link*. That link will match with one of the IDs in the shown error message, something like
-      `google.com_25bjxd785j48fdc5p6qax59ahj@group.calendar.google.com`.'
+  - Start `goto-meet --calendars bla --log ''`. This will fail because calendar `bla` doesn't exist, but in the
+    terminal it will show which calendars are available.
+  - Choose one of the available ones. If you can't make a choice, click in the browser on *Options* for the
+    calendar that you are targeting, then *Settings and sharing*, then *Get shareable link*. That link will match
+    with one of the IDs in the shown error message, something like
+    `google.com_25bjxd785j48fdc5p6qax59ahj@group.calendar.google.com`.'
 - `--starts-in` defines how long before an event a notification should be shown. The default is 1 minute.
 - `--interval` defines how long `goto-meet` waits between calendar polls. The default is 10 minutes; it's
   assumed that new calendar entries don't appear more frequently, and 10 minutes seems to play nicely with a laptop
