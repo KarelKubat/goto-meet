@@ -52,5 +52,6 @@ chdir("/tmp/") or die("cannot cd to /tmp: $!\n");
 system("zip -ur $zip goto-meet-$main_version/")
   and die("zip failed to to create $zip\n");
 
+chdir($path) or die("cannot cd to $path: $!\n");
 system("gh release create v$main_version '$zip#$main_version $uname $chiptag'")
   and die("failed to `gh release create`\n");
