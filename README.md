@@ -26,7 +26,8 @@ utility to render popups.
 
 You'll need a Go compiler and support to build your own binary.
 
-- Download the `goto-meet` sources
+- Download the `goto-meet` sources. Use `git clone` or fetch the sources as a zip or as a `.tar.gz` file
+  from the distributions.
 - Review the sources if you want to check that `goto-meet` doesn't do anything malicious.
 - In the downloaded location, run `go mod init`
 - Fetch required libraries:
@@ -44,7 +45,7 @@ sudo mv goto-meet /usr/local/bin/  # or use another appropriate location along y
 ### Option 2: Using a pre-built release
 
 If you don't have a Go compiler and if you decide that a pre-built binary is okay, then just fetch a
-release and unzip it. In it you will find:
+binary release and unzip it. In it you will find:
 
 - The `goto-meet` binary
 - `nl.kubat.goto-meet.plist` which you may use on MacOSX to have `goto-meet` run as a background process
