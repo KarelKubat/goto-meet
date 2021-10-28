@@ -133,7 +133,7 @@ If this step fails for some reason, just remove `~/.goto-meet/token.json` and re
 For a testrun, try:
 
 ```shell
-goto-meet --log='' --loops=3 --poll-interval=5s --starts-in=48h --look-ahead=72h
+goto-meet --log='' --loops=3 --interval=5s --starts-in=48h --look-ahead=72h
 ```
 
 This will instruct `goto-meet` to do 3 polls, each 5 seconds apart. It will consider all events with a video
@@ -167,13 +167,13 @@ goto-meet --help
   can choose a different one. If you want to poll several calendars, say your default and a calender `office`, then
   you can start two `goto-meet` processes, where one overrides the polled calendar using `--calendar-id=office`.
 - `--starts-in` defines how long before an event a notification should be shown. The default is 1 minute.
-- `--poll-interval` defines how long `goto-meet` waits between calendar polls. The default is 10 minutes; it's
+- `--interval` defines how long `goto-meet` waits between calendar polls. The default is 10 minutes; it's
   assumed that new calendar entries don't appear more frequently, and 10 minutes seems to play nicely with a laptop
   going to sleep, waking up, and not missing upcoming events.
 - `--look-ahead` defines how far ahead `goto-meet` looks when fetching new calendar entries. The default is 1 hour,
-  meaning that each 30 minutes (the `--poll-interval`) the events for the next hour are fetched (the
+  meaning that each 30 minutes (the `--interval`) the events for the next hour are fetched (the
 `--look-ahead`).
-- `--max-results-per-poll` limits the number of fetched entries during each poll. The default is 50, which assumes
+- `--results` limits the number of fetched entries during each poll. The default is 50, which assumes
   that you won't have more than 50 events within the next hour.
 
 ### UI
@@ -185,7 +185,7 @@ goto-meet --help
 
 ### Location of the config files
 
-Use `--credentials-file` and `--token-file` to point `goto-meet` to different files than `credentials.json`
+Use `--credentials` and `--token` to point `goto-meet` to different files than `credentials.json`
 and `token.json` in the default location `~/.goto-meet/`. For example you could generate different configs
 for different Google accounts and run several `goto-meet` processes to poll their calendars.
 

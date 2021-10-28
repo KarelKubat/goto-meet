@@ -14,7 +14,7 @@
 		<string>/usr/local/bin/goto-meet</string>
 		<!--
 		  Add additional settings here. Example:
-		  <string>--client-timeout</string> <string>30s</string>
+		  <string>--timeout</string> <string>30s</string>
 		-->
 	</array>
 	<key>RunAtLoad</key>

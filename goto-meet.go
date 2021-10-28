@@ -23,19 +23,19 @@ const (
 
 var (
 	// How to contact Google Calendar
-	tokenFileFlag       = flag.String("token-file", "~/.goto-meet/token.json", "path to JSON configuration with access access_token etc., supports `~/` prefix")
-	credentialsFileFlag = flag.String("credentials-file", "~/.goto-meet/credentials.json", "path to JSON configuration with client_id, project_id etc., supports '~/' prefix")
-	clientTimeoutFlag   = flag.Duration("client-timeout", time.Second*30, "timeout when polling for new calendar entries, 0 to prevent timing out")
+	tokenFileFlag       = flag.String("token", "~/.goto-meet/token.json", "path to JSON configuration with access access_token etc., supports `~/` prefix")
+	credentialsFileFlag = flag.String("credentials", "~/.goto-meet/credentials.json", "path to JSON configuration with client_id, project_id etc., supports '~/' prefix")
+	clientTimeoutFlag   = flag.Duration("timeout", time.Second*30, "timeout when polling for new calendar entries, 0 to prevent timing out")
 
 	// Calendar processing
 	calendarIDFlag     = flag.String("calendar-id", "primary", "calendar to inspect, 'primary' is your default calendar")
-	resultsPerPollFlag = flag.Int("max-results-per-poll", 50, "max results to process per calendar poll")
-	pollIntervalFlag   = flag.Duration("poll-interval", time.Minute*10, "wait time between calendar polls")
+	resultsPerPollFlag = flag.Int("results", 50, "max results to process per calendar poll")
+	pollIntervalFlag   = flag.Duration("interval", time.Minute*10, "wait time between calendar polls")
 	lookaheadFlag      = flag.Duration("look-ahead", time.Hour*1, "fetch calendar events that start before this duration")
 	startsInFlag       = flag.Duration("starts-in", time.Minute, "how much in advance of a meeting should an alert be generated")
 
 	// How to notify the user
-	notificationTypeFlag = flag.String("notification-type", "macos_osascript", "type of notifications to generate")
+	notificationTypeFlag = flag.String("notification", "macos_osascript", "type of notifications to generate")
 	onscreenSecFlag      = flag.Int("onscreen-sec", 120, "number of seconds to keep a notification visible")
 	browserFlag          = flag.String("browser", "", "browser to activate for calendar links, '' means default browser")
 
