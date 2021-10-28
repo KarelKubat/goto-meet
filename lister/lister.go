@@ -17,7 +17,7 @@ import (
 type Opts struct {
 	Service           *calendar.Service
 	MaxResultsPerPoll int
-	CalendarID        string
+	Calendars         []string
 	LookAhead         time.Duration
 }
 
@@ -34,7 +34,7 @@ type Lister struct {
 }
 
 // New creates a Lister.
-func New(opts *Opts) (*Lister, error) {
+func New(ctx context.Context, opts *Opts) (*Lister, error) {
 	// Sanity checks for the options
 	if opts.Service == nil {
 		return nil, errors.New("cannot instantiate a lister with a nil service")
@@ -42,9 +42,33 @@ func New(opts *Opts) (*Lister, error) {
 	if opts.MaxResultsPerPoll > 250 {
 		return nil, errors.New("the maximum number of entries to fetch is limited to 250")
 	}
-	if opts.CalendarID == "" {
-		return nil, errors.New("the lister requires a calendar ID")
+	if len(opts.Calendars) == 0 {
+		return nil, errors.New("there must be at least one calendar to check")
 	}
+
+	// Verify that the user's calendars exist.
+	cals, err := opts.Service.CalendarList.
+		List().
+		Context(ctx).
+		ShowDeleted(false).
+		Do()
+	if err != nil {
+		return nil, errors.New("cannot list user's calendars")
+	}
+	availableMap := map[string]struct{}{
+		"primary": struct{}{}, // "primary" always exists
+	}
+	availableNames := []string{}
+	for _, it := range cals.Items {
+		availableMap[it.Id] = struct{}{}
+		availableNames = append(availableNames, it.Id)
+	}
+	for _, cal := range opts.Calendars {
+		if _, ok := availableMap[cal]; !ok {
+			return nil, fmt.Errorf("no such calendar %q, available: %v", cal, availableNames)
+		}
+	}
+
 	log.Printf("calendar lister will look ahead %v and fetch max %v entries each run", opts.LookAhead, opts.MaxResultsPerPoll)
 	return &Lister{
 		opts: opts,
@@ -56,30 +80,33 @@ func (l *Lister) Fetch(ctx context.Context) error {
 	timeMin := time.Now().Format(time.RFC3339)
 	timeMax := time.Now().Add(l.opts.LookAhead).Format(time.RFC3339)
 
-	events, err := l.opts.Service.Events.
-		List(l.opts.CalendarID).
-		MaxResults(int64(l.opts.MaxResultsPerPoll)).
-		ShowDeleted(false).
-		Context(ctx).
-		SingleEvents(true).
-		TimeMin(timeMin).
-		TimeMax(timeMax).
-		OrderBy("startTime").
-		Do()
-	// TODO: skip not fully accepted entries where the user is a "maybe"
-	if err != nil {
-		return fmt.Errorf("unable to retrieve next %v events for calendar %q: %v", l.opts.MaxResultsPerPoll, l.opts.CalendarID, err)
+	for _, calendar := range l.opts.Calendars {
+		events, err := l.opts.Service.Events.
+			List(calendar).
+			MaxResults(int64(l.opts.MaxResultsPerPoll)).
+			ShowDeleted(false).
+			Context(ctx).
+			SingleEvents(true).
+			TimeMin(timeMin).
+			TimeMax(timeMax).
+			OrderBy("startTime").
+			Do()
+		// TODO: skip not fully accepted entries where the user is a "maybe"
+		if err != nil {
+			return fmt.Errorf("unable to retrieve next %v events for calendar %q: %v", l.opts.MaxResultsPerPoll, calendar, err)
+		}
+
+		l.list = &List{}
+		for _, entry := range events.Items {
+			i, err := item.New(entry)
+			if err != nil {
+				return fmt.Errorf("cannot initialize calendar entry: %v", err)
+			}
+			l.list.Items = append(l.list.Items, i)
+		}
+		log.Printf("calendar %v: %v upcoming events", calendar, len(l.list.Items))
 	}
 
-	l.list = &List{}
-	for _, entry := range events.Items {
-		i, err := item.New(entry)
-		if err != nil {
-			return fmt.Errorf("cannot initialize calendar entry: %v", err)
-		}
-		l.list.Items = append(l.list.Items, i)
-	}
-	log.Printf("found %v upcoming events", len(l.list.Items))
 	return nil
 }
 

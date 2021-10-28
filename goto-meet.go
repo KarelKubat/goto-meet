@@ -28,7 +28,7 @@ var (
 	clientTimeoutFlag   = flag.Duration("timeout", time.Second*30, "timeout when polling for new calendar entries, 0 to prevent timing out")
 
 	// Calendar processing
-	calendarIDFlag     = flag.String("calendar-id", "primary", "calendar to inspect, 'primary' is your default calendar")
+	calendarsFlag      = flag.String("calendars", "primary", "comma-separated list of calendars to inspect, 'primary' is your default calendar")
 	resultsPerPollFlag = flag.Int("results", 50, "max results to process per calendar poll")
 	pollIntervalFlag   = flag.Duration("interval", time.Minute*10, "wait time between calendar polls")
 	lookaheadFlag      = flag.Duration("look-ahead", time.Hour*1, "fetch calendar events that start before this duration")
@@ -92,10 +92,10 @@ func main() {
 	if err != nil {
 		log.Fatalf("cannot create client for the calendar service: %v", err)
 	}
-	lister, err := lister.New(&lister.Opts{
+	lister, err := lister.New(ctx, &lister.Opts{
 		Service:           srv,
 		MaxResultsPerPoll: *resultsPerPollFlag,
-		CalendarID:        *calendarIDFlag,
+		Calendars:         strings.Split(*calendarsFlag, ","),
 		LookAhead:         *lookaheadFlag,
 	})
 	if err != nil {
