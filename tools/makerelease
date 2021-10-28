@@ -64,7 +64,7 @@ Probably you want to:
  - Redo `git push`
 
 If you are sure: to replace that version with this snapshot, run:
-- Run: gh release delete v$main_version
+- Run: gh release delete -yes v$main_version
 - Redo `git push`
 
 EOF
