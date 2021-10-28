@@ -56,7 +56,7 @@ chdir($path) or die("cannot cd to $path: $!\n");
 my $success;
 for my $action ("create", "upload --clobber") {
     print("Releasing: trying action `$action`\n");
-    if (system("gh release $action v$main_version '/tmp/$zip#$main_version $uname $chiptag'") == 0 {
+    if (system("gh release $action v$main_version '/tmp/$zip#$main_version $uname $chiptag'") == 0) {
         $success = 1;
         last;
     }
