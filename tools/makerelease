@@ -1,0 +1,56 @@
+#!/usr/bin/env perl
+use strict;
+use File::Basename;
+use File::Spec;
+
+# Purpose: create a release for upload.
+
+my $path = File::Spec->rel2abs(__FILE__);
+$path =~ s{tools/makerelease$}{};
+chdir($path) or die("cannot cd to $path: $!\n");
+
+system("go build goto-meet.go")
+  and die("failed to make binary");
+
+my $main = "$path/goto-meet.go";
+my $main_version;
+open(my $if, $main) or die("cannot open $main: $!\n");
+while (my $line = <$if>){
+    chomp($line);
+    next unless ($line =~ m{version =});
+    $line =~ s{version = "}{};
+    $line =~ s{".*}{};
+    $main_version = $line * 1.0; # force number
+    last;
+}
+die("failed to extract version from $main\n") unless ($main_version);
+
+# General architecture: Darwin, Linux, ...
+open(my $if, "uname |") or die("cannot start uname: $!\n");
+my $uname = <$if>;
+chomp($uname);
+die("No support for uname $uname\n") unless ($uname eq "Darwin");
+
+# Chip tag, which is the last part of `uname -a` on Darwin
+open(my $if, "uname -a |") or die("cannot start uname -a: $!\n");
+my $all = <$if>;
+chomp($all);
+my @parts = split(/ /, $all);
+my $chiptag = $parts[$#parts];
+
+my $folder = "/tmp/goto-meet-$main_version/$uname-$chiptag/";
+system("mkdir -p $folder")
+  and die("cannot make release folder $folder: $!\n");
+
+system("mv goto-meet $folder") 
+  and die("cannot move binary into $folder\n");
+system("cp nl.kubat.goto-meet.plist $folder") 
+  and die("cannot copy nl.kubat.goto-meet.plist to $folder\n");
+
+my $zip = "goto-meet-$main_version.zip";
+chdir("/tmp/") or die("cannot cd to /tmp: $!\n");
+system("zip -ur $zip goto-meet-$main_version/")
+  and die("zip failed to to create $zip\n");
+
+system("gh release create v$main_version '$zip#$main_version $uname $chiptag")
+  and die("failed to `gh release create`\n");
