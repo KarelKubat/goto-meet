@@ -54,7 +54,7 @@ system("zip -ur $zip goto-meet-$main_version/")
 
 chdir($path) or die("cannot cd to $path: $!\n");
 my $success;
-system("go release create v$main_version '/tmp/$zip#$main_version $uname $chiptag'")
+system("gh release create v$main_version '/tmp/$zip#$main_version $uname $chiptag'")
   and die <<EOF;
 
 Failed to create a new realese tagged v$main_version.
