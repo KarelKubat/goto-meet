@@ -53,15 +53,17 @@ system("zip -ur $zip goto-meet-$main_version/")
   and die("zip failed to to create $zip\n");
 
 chdir($path) or die("cannot cd to $path: $!\n");
-my $success;
-system("gh release create v$main_version '/tmp/$zip#$main_version $uname $chiptag'")
+print("Enter as title: v$main_version if prompted so, or hit ^C to abort.\n");
+my $cmd = "gh release create v$main_version '/tmp/$zip#$main_version $uname $chiptag'";
+system($cmd)
   and die <<EOF;
+`$cmd` failed.
 
 Failed to create a new realese tagged v$main_version.
 Probably you want to:
- - Increase the version ID in `goto-meet.go`
- - Match this in `README.md`
- - Redo `git push`
+- Increase the version ID in `goto-meet.go`
+- Match this in `README.md`
+- Redo `git push`
 
 If you are sure: to replace that version with this snapshot, run:
 - Run: gh release delete --yes v$main_version
