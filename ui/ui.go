@@ -93,7 +93,8 @@ type temp struct {
 
 // Show notifies the user of an upcoming event.
 func (n *Notifier) Schedule(it *item.Item) {
-	key := fmt.Sprintf("%v::%v::%v", it.Title, it.JoinLink, it.CalendarLink)
+	// TODO: abstract cache handling
+	key := fmt.Sprintf("%v::%v::%v::%v", it.Title, it.JoinLink, it.CalendarLink, it.Start)
 	if _, ok := n.cache[key]; ok {
 		log.Printf("notification %q already processed", key)
 		return
