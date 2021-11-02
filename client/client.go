@@ -52,7 +52,7 @@ func New(ctx context.Context, opts *Opts) (*calendar.Service, error) {
 		log.Printf("token file %q scanned", opts.TokenFile)
 	} else {
 		log.Printf("token file %q not found, fetching from web", opts.TokenFile)
-		if tok, err = getTokenFromWeb(config); err != nil {
+		if tok, err = getTokenFromWeb(ctx, config); err != nil {
 			return nil, fmt.Errorf("cannot read web token: %v", err)
 		}
 		if err = saveToken(opts.TokenFile, tok); err != nil {
@@ -98,7 +98,7 @@ func saveToken(path string, token *oauth2.Token) error {
 
 // getTokenFromWeb fetches an online token. This code is run when a local tokenfile doesn't
 // exist yet (or when it's faulty).
-func getTokenFromWeb(config *oauth2.Config) (*oauth2.Token, error) {
+func getTokenFromWeb(ctx context.Context, config *oauth2.Config) (*oauth2.Token, error) {
 	authURL := config.AuthCodeURL("state-token", oauth2.AccessTypeOffline)
 	fmt.Printf("%s\n%s\n%s",
 		"Go to the following link in your browser then type the authorization code:",
@@ -113,7 +113,7 @@ func getTokenFromWeb(config *oauth2.Config) (*oauth2.Token, error) {
 		return nil, errors.New("empty authorization code")
 	}
 
-	tok, err := config.Exchange(context.TODO(), authCode)
+	tok, err := config.Exchange(ctx, authCode)
 	if err != nil {
 		return nil, fmt.Errorf("unable to retrieve token from web: %v", err)
 	}
