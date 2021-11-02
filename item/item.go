@@ -4,7 +4,6 @@ package item
 import (
 	"errors"
 	"fmt"
-	"log"
 	"regexp"
 	"time"
 
@@ -97,9 +96,5 @@ func (i *Item) findStart() error {
 	}
 	i.StartsIn = i.Start.Sub(time.Now())
 
-	if i.StartsIn < 0 {
-		// A (repeating) event started in the past is not an error. We still want the notifier to look at it.
-		log.Printf("negative duration %v for %q; Start=%+v, OriginalStartTime=%+v", i.StartsIn, i.Event.Summary, i.Event.Start, i.Event.OriginalStartTime)
-	}
 	return nil
 }
