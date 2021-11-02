@@ -256,4 +256,5 @@ Thanks!
 
 ```text
 0.01 2021-10 Initial version-stamped release.
+0.02 2021-11 Unit tests added.
 ```
