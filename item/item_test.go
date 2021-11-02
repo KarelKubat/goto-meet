@@ -6,38 +6,6 @@ import (
 	"google.golang.org/api/calendar/v3"
 )
 
-func TestSanitize(t *testing.T) {
-	for _, test := range []struct {
-		in      string
-		wantOut string
-	}{
-		{
-			// no sanitizing necessary
-			in:      "whatever",
-			wantOut: "whatever",
-		},
-		{
-			// one quote
-			in:      "what'ever",
-			wantOut: "whatever",
-		},
-		{
-			// multiple quotes
-			in:      "w'h'a't'e'v'e'r",
-			wantOut: "whatever",
-		},
-		{
-			// weird chars are left as-is
-			in:      `[]{}"/_.`,
-			wantOut: `[]{}"/_.`,
-		},
-	} {
-		if out := sanitize(test.in); out != test.wantOut {
-			t.Errorf("sanitize(%q) = %q, want %q", test.in, out, test.wantOut)
-		}
-	}
-}
-
 func TestFindJoinLink(t *testing.T) {
 	for _, test := range []struct {
 		hangoutLink  string
@@ -90,5 +58,3 @@ func TestFindJoinLink(t *testing.T) {
 		}
 	}
 }
-
-// TODO: add findStart() test
