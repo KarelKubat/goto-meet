@@ -10,7 +10,6 @@ use File::Spec;
 my $top = File::Spec->rel2abs(__FILE__);
 $top =~ s{/tools/gotests$}{};
 $top =~ s{.*/}{};
-print("top: $top\n");
 
 my (@gotest, @errs);
 
@@ -23,11 +22,7 @@ sub wanted {
 
     my $test = $f;
     $test =~ s{.go$}{_test.go};
-    if (-f $test) {
-        my $target = $test;
-        $target =~ s{[a-z._-]+$}{};
-        push(@gotest, "$top/$target");
-    } else {
+    if (! -f $test) {
         push(@errs, "no testfile '$test' for $f");
     }
 }
@@ -36,9 +31,8 @@ find({
     wanted => \&wanted,
     no_chdir => 1,
 },  '.');
-for my $f (@gotest) {
-    system("go test $f") and push(@errs, "go test $f failed");
-}
+
+system("go test ./...") and push(@errs, "go test(s) failed");
 
 for my $e (@errs) {
     print("tools/gotests: error: $e\n")
