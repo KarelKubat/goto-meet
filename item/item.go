@@ -43,6 +43,12 @@ func New(event *calendar.Event) (*Item, error) {
 	return out, nil
 }
 
+// String returns a readable representation of an item.
+func (i *Item) String() string {
+	return fmt.Sprintf("%q (join:%v, calendar:%v, starts on %v, in:%v)",
+		i.Title, i.JoinLink, i.CalendarLink, i.Start, i.StartsIn)
+}
+
 // findJoinLink is a helper to find a link to join a meeting in the calendar event.
 func (i *Item) findJoinLink() {
 	// Preferred is the hangout link, if absent, check the summary and description for known
