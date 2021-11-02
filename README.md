@@ -244,6 +244,7 @@ arises. Pull requests are of course always welcome. The wishlist, in abbreviated
 - Implement notifications for other OSses.
 - Add a method to prevent double invocations on non-MacOSX systems. Maybe `goto-meet` must become aware of its own
   PID file.
+- Implement notifications for other calendars - notably Microsoft Teams seems popular. I have no usecase though.  
 
 ## Version & Release Log (most recent last)
 
