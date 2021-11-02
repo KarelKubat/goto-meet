@@ -31,3 +31,35 @@ func TestExpandPath(t *testing.T) {
 		}
 	}
 }
+
+func TestSanitize(t *testing.T) {
+	for _, test := range []struct {
+		in      string
+		wantOut string
+	}{
+		{
+			// no sanitizing necessary
+			in:      "whatever",
+			wantOut: "whatever",
+		},
+		{
+			// one quote
+			in:      "what'ever",
+			wantOut: "whatever",
+		},
+		{
+			// multiple quotes
+			in:      "w'h'a't'e'v'e'r",
+			wantOut: "whatever",
+		},
+		{
+			// weird chars are left as-is
+			in:      `[]{}"/_.`,
+			wantOut: `[]{}"/_.`,
+		},
+	} {
+		if out := Sanitize(test.in); out != test.wantOut {
+			t.Errorf("Sanitize(%q) = %q, want %q", test.in, out, test.wantOut)
+		}
+	}
+}

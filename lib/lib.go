@@ -19,3 +19,8 @@ func ExpandPath(p string) (string, error) {
 	}
 	return p, nil
 }
+
+// Sanitize is a helper to make a string suitable for processing in the Notifier.
+func Sanitize(s string) string {
+	return strings.Replace(s, "'", "", -1)
+}
