@@ -6,12 +6,11 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"os/user"
-	"path/filepath"
 	"strings"
 	"time"
 
 	"goto-meet/client"
+	"goto-meet/lib"
 	"goto-meet/lister"
 	"goto-meet/ui"
 )
@@ -62,12 +61,12 @@ func main() {
 		log.SetOutput(logFile)
 	}
 
-	tokenPath, err := expandPath(*tokenFileFlag)
+	tokenPath, err := lib.ExpandPath(*tokenFileFlag)
 	if err != nil {
 		log.Fatal(err)
 	}
 	log.Printf("path to token file: %v", tokenPath)
-	credentialsPath, err := expandPath(*credentialsFileFlag)
+	credentialsPath, err := lib.ExpandPath(*credentialsFileFlag)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -139,16 +138,4 @@ func main() {
 
 	// Allow any notifications from the last loop to appear.
 	time.Sleep(time.Second)
-}
-
-// expandPath is a helper to expand typical Unix shortands in paths.
-func expandPath(p string) (string, error) {
-	if strings.HasPrefix(p, "~/") {
-		usr, err := user.Current()
-		if err != nil {
-			return "", fmt.Errorf("cannot find user's homedir: %v", err)
-		}
-		return filepath.Join(usr.HomeDir, p[2:]), nil
-	}
-	return p, nil
 }
