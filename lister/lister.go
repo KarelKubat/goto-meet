@@ -56,7 +56,7 @@ func New(ctx context.Context, opts *Opts) (*Lister, error) {
 		return nil, errors.New("cannot list user's calendars")
 	}
 	availableMap := map[string]struct{}{
-		"primary": struct{}{}, // "primary" always exists
+		"primary": {}, // "primary" always exists
 	}
 	availableNames := []string{}
 	for _, it := range cals.Items {

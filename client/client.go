@@ -29,7 +29,7 @@ type Opts struct {
 func New(ctx context.Context, opts *Opts) (*calendar.Service, error) {
 	// Sanity
 	if opts.TokenFile == "" || opts.CredentialsFile == "" {
-		return nil, errors.New("cannot instantiate client: token and credentials file must be given")
+		return nil, errors.New("cannot instantiate client: token and credentials files must be given")
 	}
 	// Instantiate the configuration.
 	b, err := ioutil.ReadFile(opts.CredentialsFile)

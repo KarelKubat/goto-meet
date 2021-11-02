@@ -1,0 +1,46 @@
+#!/usr/bin/env perl
+use strict;
+use File::Basename;
+use File::Find;
+use File::Spec;
+
+# Purpose: check that every .go file has a test and that it works.
+
+# Find the name of this module. This script **must** be tools/gotests.
+my $top = File::Spec->rel2abs(__FILE__);
+$top =~ s{/tools/gotests$}{};
+$top =~ s{.*/}{};
+print("top: $top\n");
+
+my (@gotest, @errs);
+
+sub wanted {
+    my $f = $File::Find::name;
+    $f =~ s{^./}{};
+
+    return if ($f !~ m{.go$} or $f =~ m{_test.go$});
+    return unless ($f =~ m{.go$});
+
+    my $test = $f;
+    $test =~ s{.go$}{_test.go};
+    if (-f $test) {
+        my $target = $test;
+        $target =~ s{[a-z._-]+$}{};
+        push(@gotest, "$top/$target");
+    } else {
+        push(@errs, "no testfile '$test' for $f");
+    }
+}
+
+find({
+    wanted => \&wanted,
+    no_chdir => 1,
+},  '.');
+for my $f (@gotest) {
+    system("go test $f") and push(@errs, "go test $f failed");
+}
+
+for my $e (@errs) {
+    print("tools/gotests: error: $e\n")
+}
+exit(1) if ($#errs > -1);

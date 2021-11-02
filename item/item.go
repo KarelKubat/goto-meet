@@ -50,7 +50,7 @@ func sanitize(s string) string {
 
 // findJoinLink is a helper to find a link to join a meeting in the calendar event.
 func (i *Item) findJoinLink() {
-	// Preferred is the hangout link, if absent, check  the summary and description for known
+	// Preferred is the hangout link, if absent, check the summary and description for known
 	// URLs.
 	if i.Event.HangoutLink != "" {
 		i.JoinLink = i.Event.HangoutLink
