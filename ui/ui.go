@@ -61,7 +61,7 @@ type Opts struct {
 
 // Notifier wraps the applicable notification configuration.
 type Notifier struct {
-	opts      *Opts                 // name and lead time to show an alert before a meeting starts
+	opts      *Opts                 // name, lead time etc. to show an alert before a meeting starts
 	config    *notificationSettings // one of the notificationConfigs
 	processed *cache.Cache          // has an event been processed yet?
 }
@@ -95,23 +95,13 @@ type temp struct {
 // Show notifies the user of an upcoming event.
 func (n *Notifier) Schedule(it *item.Item) {
 	n.processed.Weed()
-	if n.processed.Lookup(it) {
-		log.Printf("notification %v already processed", it)
+	toSchedule, waitTime := n.shouldSchedule(it)
+	if !toSchedule {
 		return
 	}
 
 	go func() {
-		waitTime := it.StartsIn - n.opts.StartsIn
-		log.Printf("notification in %v for event %q, starts on %v (in %v, joinlink %q, calendarlink %q)",
-			waitTime, it.Title, it.Start, it.StartsIn, it.JoinLink, it.CalendarLink)
-
-		// Don't act on calendar items that lack a joinlink.
-		if it.JoinLink == "" {
-			log.Printf("no meeting link, skipped")
-			return
-		}
-
-		// Wait until the calendar event is about to start.
+		log.Printf("notification in %v for event %v", waitTime, it)
 		time.Sleep(waitTime)
 
 		// Generate and render a notification.
@@ -147,4 +137,22 @@ func (n *Notifier) Schedule(it *item.Item) {
 			return
 		}
 	}()
+}
+
+// shouldSchedule is a helper to determine whether an item is worthy of scheduling.
+func (n *Notifier) shouldSchedule(it *item.Item) (bool, time.Duration) {
+	waitTime := it.StartsIn - n.opts.StartsIn
+	switch {
+	case waitTime < 0:
+		log.Printf("%v starts in the past, not worthy scheduling", it)
+		return false, waitTime
+	case it.JoinLink == "":
+		log.Printf("%v has no join link, not worthy scheduling", it)
+		return false, waitTime
+	case n.processed.Lookup(it):
+		log.Printf("%v already processed, not worthy (re)scheduling", it)
+		return false, waitTime
+	default:
+		return true, waitTime
+	}
 }
