@@ -2,7 +2,7 @@
 
 **`goto-meet` is a command-line program that polls your Google Calendar and displays notifications of upcoming meetings
 containing a link to a video conference. The notifications have 3 buttons: one to join the video meeting, one
-to see (or edit) the calendar entry, and one to ignore the notification.**
+to see (or edit) the calendar item, and one to ignore the notification.**
 
 Like many similar utilities, `goto-meet` was born during the COVID19 lockdown period when meetings no longer
 occurred in person and everything was via video chat. I wanted to have a straight forward notification system

@@ -1,4 +1,4 @@
-// Package item wraps parsing and handling of a calendar entry.
+// Package item wraps parsing and handling of a calendar item.
 package item
 
 import (
@@ -20,10 +20,10 @@ var joinRegexes = []*regexp.Regexp{
 
 // Item is the receiver struct.
 type Item struct {
-	Event        *calendar.Event // entry as returned by Google Calendar
+	Event        *calendar.Event // item as returned by Google Calendar
 	Title        string          // description of the event
 	JoinLink     string          // extracted URL to join
-	CalendarLink string          // extracted URL to see the calendar entry
+	CalendarLink string          // extracted URL to see the calendar item
 	Start        time.Time       // event start stamp
 	StartsIn     time.Duration   // event start from now
 }

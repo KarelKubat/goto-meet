@@ -97,10 +97,10 @@ func (l *Lister) Fetch(ctx context.Context) error {
 		}
 
 		l.list = &List{}
-		for _, entry := range events.Items {
-			i, err := item.New(entry)
+		for _, it := range events.Items {
+			i, err := item.New(it)
 			if err != nil {
-				return fmt.Errorf("cannot initialize calendar entry: %v", err)
+				return fmt.Errorf("cannot initialize calendar item: %v", err)
 			}
 			l.list.Items = append(l.list.Items, i)
 		}
