@@ -144,7 +144,7 @@ the next 2 days (48h).
 This of course assumes that you have a video meeting within that period. Adjust the flags `--look-ahead` and
 `--starts-in` accordingly, until `goto-meet` finds something worth while.
 
-NOTE: Durations are given as a number, followed by a prefix, such as `10s` or `20m` or `3h`. There is no suffix for
+NOTE: Durations are given as a number, followed by a postfix, such as `10s` or `20m` or `3h`. There is no suffix for
 days, just use the number of days times 24, with `h` as the suffix. Different specifiers may also be
 combined, as in `23h59m30s`, which is 30 seconds short of one full day.
 
