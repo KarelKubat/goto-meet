@@ -42,6 +42,8 @@ go build goto-meet.go              # build the binary goto-meet
 sudo mv goto-meet /usr/local/bin/  # or use another appropriate location along your $PATH
 ```
 
+If you're OK with `/usr/local/bin`, you can just run `make install` or even `make reload`, see the `Makefile`.
+
 ### Option 2: Using a pre-built release
 
 If you don't have a Go compiler and if you decide that a pre-built binary is okay, then just fetch a
