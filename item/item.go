@@ -6,8 +6,9 @@ import (
 	"fmt"
 	"log"
 	"regexp"
-	"strings"
 	"time"
+
+	"goto-meet/lib"
 
 	"google.golang.org/api/calendar/v3"
 )
@@ -32,7 +33,7 @@ type Item struct {
 func New(event *calendar.Event) (*Item, error) {
 	out := &Item{
 		Event:        event,
-		Title:        sanitize(event.Summary),
+		Title:        lib.Sanitize(event.Summary),
 		CalendarLink: event.HtmlLink,
 	}
 	if ers := out.findStart(); ers != nil {
@@ -41,11 +42,6 @@ func New(event *calendar.Event) (*Item, error) {
 	out.findJoinLink()
 
 	return out, nil
-}
-
-// sanitize is a helper to make a string suitable for processing in the Notifier.
-func sanitize(s string) string {
-	return strings.Replace(s, "'", "", -1)
 }
 
 // findJoinLink is a helper to find a link to join a meeting in the calendar event.
