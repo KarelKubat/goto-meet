@@ -62,7 +62,7 @@ func TestShouldSchedule(t *testing.T) {
 	} {
 		n := &Notifier{
 			opts: &Opts{
-				StartsIn: time.Minute * 30, // consider anything that starts half an hour
+				StartsIn: time.Minute * 30, // consider anything that starts within half an hour
 			},
 			processed: cache.New(),
 		}
