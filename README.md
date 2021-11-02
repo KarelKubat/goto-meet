@@ -230,12 +230,11 @@ Or you can fire up `goto-meet` after each reboot by adding the following line to
 @reboot /usr/local/bin/goto-meet &
 ```
 
-## TODOs
+## Wishlist
 
 This version of `goto-meet` only scratches my own itch, but I may implement support for features as the need
 arises. Pull requests are of course always welcome. The wishlist, in abbreviated form:
 
-- Add unit tests and make `goto-meet` a complete package
 - The MacOSX notifications are a bit clunky. Is there a nicer way?
 - If notifications allow this: can the browser be instructed to open on a given monitor? `goto-meet` supports a
   work-around to force opening video meetings by another browser than your default one, but this still requires
@@ -257,4 +256,5 @@ Thanks!
 ```text
 0.01 2021-10 Initial version-stamped release.
 0.02 2021-11 Unit tests added.
+0.03 2021-11 Moar unit tests, bugfix in caching of items (time is now in the key).
 ```
