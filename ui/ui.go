@@ -9,6 +9,7 @@ import (
 	"text/template"
 	"time"
 
+	"goto-meet/cache"
 	"goto-meet/item"
 )
 
@@ -60,9 +61,9 @@ type Opts struct {
 
 // Notifier wraps the applicable notification configuration.
 type Notifier struct {
-	opts   *Opts                 // name and lead time to show an alert before a meeting starts
-	config *notificationSettings // one of the notificationConfigs
-	cache  map[string]struct{}   // has an alert been shown yet?
+	opts      *Opts                 // name and lead time to show an alert before a meeting starts
+	config    *notificationSettings // one of the notificationConfigs
+	processed *cache.Cache          // has an event been processed yet?
 }
 
 // New creates a Notifier.
@@ -72,9 +73,9 @@ func New(opts *Opts) (*Notifier, error) {
 		if config.name == opts.Name {
 			log.Printf("notifier %q created to alert %v before event start", opts.Name, opts.StartsIn)
 			return &Notifier{
-				config: config,
-				opts:   opts,
-				cache:  map[string]struct{}{},
+				config:    config,
+				opts:      opts,
+				processed: cache.New(),
 			}, nil
 		}
 		availableNotificationTypes = append(availableNotificationTypes, config.name)
@@ -93,13 +94,11 @@ type temp struct {
 
 // Show notifies the user of an upcoming event.
 func (n *Notifier) Schedule(it *item.Item) {
-	// TODO: abstract cache handling
-	key := fmt.Sprintf("%v::%v::%v::%v", it.Title, it.JoinLink, it.CalendarLink, it.Start)
-	if _, ok := n.cache[key]; ok {
-		log.Printf("notification %q already processed", key)
+	n.processed.Weed()
+	if n.processed.Lookup(it) {
+		log.Printf("notification %v already processed", it)
 		return
 	}
-	n.cache[key] = struct{}{}
 
 	go func() {
 		waitTime := it.StartsIn - n.opts.StartsIn
