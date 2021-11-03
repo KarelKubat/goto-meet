@@ -60,6 +60,7 @@ func main() {
 		}
 		log.SetOutput(logFile)
 	}
+	log.Printf("Welcome to goto-meet %v", version)
 
 	tokenPath, err := lib.ExpandPath(*tokenFileFlag)
 	if err != nil {
@@ -107,6 +108,7 @@ func main() {
 	for {
 		// Quit after the indicated # of loops or when we've been failing all the time.
 		nLoops++
+		log.Printf("---------- Polling loop %v ----------", nLoops)
 		if *loopsFlag > 0 && nLoops > *loopsFlag {
 			log.Printf("exiting before loop %v", nLoops)
 			break
