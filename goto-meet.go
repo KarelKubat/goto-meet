@@ -108,12 +108,11 @@ func main() {
 	for {
 		// Quit after the indicated # of loops or when we've been failing all the time.
 		nLoops++
-		log.Printf("---------- Polling loop %v ----------", nLoops)
+		log.Printf("---------- Polling loop %v (%v consecutive errors) ----------", nLoops, nFailures)
 		if *loopsFlag > 0 && nLoops > *loopsFlag {
 			log.Printf("exiting before loop %v", nLoops)
 			break
 		}
-		log.Printf("polling loop %v, consecutive polling errors: %v", nLoops, nFailures)
 
 		// Get next entries and have the ui schedule alerts.
 		if err := lister.Fetch(ctx); err != nil {
