@@ -16,6 +16,7 @@ import (
 var joinRegexes = []*regexp.Regexp{
 	regexp.MustCompile(`.*href="(https://stream.meet.google.com/[^"]*).*"`),
 	regexp.MustCompile(`.*href="(https://liveplayer.corp.google.com/[^"]*).*"`),
+	regexp.MustCompile(`.*href="(http://go/watch[^"]*).*"`),
 }
 
 // Item is the receiver struct.

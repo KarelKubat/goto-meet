@@ -144,10 +144,10 @@ func (n *Notifier) shouldSchedule(it *item.Item) (bool, time.Duration) {
 	waitTime := it.StartsIn - n.opts.StartsIn
 	switch {
 	case waitTime < 0:
-		log.Printf("%v starts in the past, not worthy scheduling", it)
+		log.Printf("%v starts in the past, not worthy scheduling; entry: %v", it, it.Event)
 		return false, waitTime
 	case it.JoinLink == "":
-		log.Printf("%v has no join link, not worthy scheduling", it)
+		log.Printf("%v has no join link, not worthy scheduling; entry: %v", it, it.Event)
 		return false, waitTime
 	case n.processed.Lookup(it):
 		log.Printf("%v already processed, not worthy (re)scheduling", it)
