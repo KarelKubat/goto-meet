@@ -100,11 +100,18 @@ func (n *Notifier) Schedule(it *item.Item) {
 		return
 	}
 
-	go func() {
+	go func(it *item.Item) {
 		log.Printf("notification in %v for event %v", waitTime, it)
 		time.Sleep(waitTime)
 
-		// Generate and render a notification.
+		// We've woken up and it's time to show a notification. In the meantime the laptop might have
+		// gone to sleep and woken up way past the the starttime of the event - in which case we just return.
+		// We accept an up-to 10min too late notification.
+		if time.Now().After(it.Start.Add(time.Minute * 10)) {
+			log.Printf("skipping notifiying for %v, it's too much in the past", it)
+			return
+		}
+
 		t := &temp{
 			Title:         it.Title,
 			VisibilitySec: n.opts.VisibilitySec,
@@ -136,7 +143,7 @@ func (n *Notifier) Schedule(it *item.Item) {
 			log.Printf("WARNING: notifier failed, output: %v, error: %v", string(out), err)
 			return
 		}
-	}()
+	}(it)
 }
 
 // shouldSchedule is a helper to determine whether an item is worthy of scheduling.
