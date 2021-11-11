@@ -15,7 +15,7 @@ that would pop up just prior to a video call, where I could click a *Join* butto
 - Any link in the event's title or description that points to a "known" video service (see `item/item.go` in
   the sources).
 
-Currently the limitation is that notifications currently only work on MacOSX, because they use the `osascript`
+Currently the limitation is that notifications only work on MacOSX, because they use the `osascript`
 utility to render popups.
 
 **Questions / remarks? You can find me on karel@kubat.nl.**
