@@ -260,4 +260,5 @@ Thanks!
 0.01 2021-10 Initial version-stamped release.
 0.02 2021-11 Unit tests added.
 0.03 2021-11 Moar unit tests, bugfix in caching of items (time is now in the key).
+0.04 2021-11 Extra check before rendering an alert, to avoid time dislocations due to laptop sleeps.
 ```
