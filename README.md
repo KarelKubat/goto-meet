@@ -220,6 +220,13 @@ ps ax | grep goto-meet   # one process must be running
 cat /tmp/goto-meet.log   # the log must now exist
 ```
 
+If you make changes to your `~/Library/LaunchAgents/nl.kubat.goto-meet.plist`, then you can restart `goto-meet` as follows:
+
+```
+launchctl unload  ~/Library/LaunchAgents/nl.kubat.goto-meet.plist
+launchctl load -w ~/Library/LaunchAgents/nl.kubat.goto-meet.plist
+```
+
 If you don't like MacOSX's `launchd` then you can just as easily fire up `goto-meet` by hand:
 
 ```shell
