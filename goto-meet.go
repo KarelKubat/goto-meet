@@ -47,6 +47,9 @@ var (
 
 func main() {
 	flag.Parse()
+	if len(flag.Args()) > 0 {
+		log.Fatalf("no positional arguments required, try `goto-meet --help`")
+	}
 
 	if *versionFlag {
 		fmt.Println(version)
