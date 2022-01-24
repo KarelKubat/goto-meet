@@ -8,8 +8,12 @@ foo:
 local:
 	go build goto-meet
 
-install: local ${BINDIR}/goto-meet
-	sudo install goto-meet ${BINDIR}/
+goto-meet: local
+
+install: ${BINDIR}/goto-meet
+
+${BINDIR}/goto-meet: goto-meet
+	sudo install goto-meet ${BINDIR}/goto-meet
 
 reload: install
 	killall goto-meet
