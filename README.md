@@ -216,4 +216,5 @@ Thanks!
 0.03 2021-11 Moar unit tests, bugfix in caching of items (time is now in the key).
 0.04 2021-11 Extra check before rendering an alert, to avoid time dislocations due to laptop sleeps.
 0.05 2022-01 Positional CLI arguments disallowed, README fixes, misc small changes.
+0.06 2022-01 Bugfix when polling multiple calendars.
 ```
