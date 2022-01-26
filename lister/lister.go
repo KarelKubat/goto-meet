@@ -80,6 +80,7 @@ func (l *Lister) Fetch(ctx context.Context) error {
 	timeMin := time.Now().Format(time.RFC3339)
 	timeMax := time.Now().Add(l.opts.LookAhead).Format(time.RFC3339)
 
+	l.list = &List{}
 	for _, calendar := range l.opts.Calendars {
 		events, err := l.opts.Service.Events.
 			List(calendar).
@@ -95,8 +96,6 @@ func (l *Lister) Fetch(ctx context.Context) error {
 		if err != nil {
 			return fmt.Errorf("unable to retrieve next %v events for calendar %q: %v", l.opts.MaxResultsPerPoll, calendar, err)
 		}
-
-		l.list = &List{}
 		for _, it := range events.Items {
 			i, err := item.New(it)
 			if err != nil {
