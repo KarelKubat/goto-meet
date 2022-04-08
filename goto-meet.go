@@ -4,12 +4,12 @@ import (
 	"context"
 	"flag"
 	"fmt"
-	"log"
 	"os"
 	"strings"
 	"time"
 
 	"github.com/KarelKubat/goto-meet/client"
+	"github.com/KarelKubat/goto-meet/l"
 	"github.com/KarelKubat/goto-meet/lib"
 	"github.com/KarelKubat/goto-meet/lister"
 	"github.com/KarelKubat/goto-meet/ui"
@@ -41,14 +41,14 @@ var (
 	// General
 	loopsFlag    = flag.Int("loops", 0, "polling loops to execute before stopping, 0 means forever (mainly for debugging)")
 	failuresFlag = flag.Int("failures", 10, "give up after # of consecutive polling errors")
-	logfileFlag  = flag.String("log", "/tmp/goto-meet.log", "log to (over)write, use '' for stdout")
+	logfileFlag  = flag.String("log", "file://stdout", "logfile, see https://github.com/KarelKubat/smartlog")
 	versionFlag  = flag.Bool("version", false, "show version and stop")
 )
 
 func main() {
 	flag.Parse()
 	if len(flag.Args()) > 0 {
-		log.Fatalf("no positional arguments required, try `goto-meet --help`")
+		l.Fatalf("no positional arguments required, try `goto-meet --help`")
 	}
 
 	if *versionFlag {
@@ -56,25 +56,20 @@ func main() {
 		os.Exit(0)
 	}
 
-	if *logfileFlag != "" {
-		logFile, err := os.Create(*logfileFlag)
-		if err != nil {
-			log.Fatalf("cannot create log file: %v", err)
-		}
-		log.SetOutput(logFile)
-	}
-	log.Printf("Welcome to goto-meet %v", version)
+	l.SetOutput(*logfileFlag)
+	l.Infof("Welcome to goto-meet %v", version)
 
 	tokenPath, err := lib.ExpandPath(*tokenFileFlag)
 	if err != nil {
-		log.Fatal(err)
+		l.Fatalf("%v", err)
 	}
-	log.Printf("path to token file: %v", tokenPath)
+
+	l.Infof("path to token file: %v", tokenPath)
 	credentialsPath, err := lib.ExpandPath(*credentialsFileFlag)
 	if err != nil {
-		log.Fatal(err)
+		l.Fatalf("%v", err)
 	}
-	log.Printf("path to credentials file: %v", credentialsPath)
+	l.Infof("path to credentials file: %v", credentialsPath)
 
 	notifier, err := ui.New(&ui.Opts{
 		Name:          *notificationTypeFlag,
@@ -83,7 +78,7 @@ func main() {
 		Browser:       *browserFlag,
 	})
 	if err != nil {
-		log.Fatal(err)
+		l.Fatalf("%v", err)
 	}
 
 	ctx := context.Background()
@@ -93,7 +88,7 @@ func main() {
 		Timeout:         *clientTimeoutFlag,
 	})
 	if err != nil {
-		log.Fatalf("cannot create client for the calendar service: %v", err)
+		l.Fatalf("cannot create client for the calendar service: %v", err)
 	}
 	lister, err := lister.New(ctx, &lister.Opts{
 		Service:           srv,
@@ -102,7 +97,7 @@ func main() {
 		LookAhead:         *lookaheadFlag,
 	})
 	if err != nil {
-		log.Fatalf("cannot create calendar lister: %v", err)
+		l.Fatalf("cannot create calendar lister: %v", err)
 	}
 
 	// Enter polling loop. Try to handle errors by only logging them until the max # of failures has been reached.
@@ -111,18 +106,18 @@ func main() {
 	for {
 		// Quit after the indicated # of loops or when we've been failing all the time.
 		nLoops++
-		log.Printf("---------- Polling loop %v (%v consecutive errors) ----------", nLoops, nFailures)
+		l.Infof("---------- Polling loop %v (%v consecutive errors) ----------", nLoops, nFailures)
 		if *loopsFlag > 0 && nLoops > *loopsFlag {
-			log.Printf("exiting before loop %v", nLoops)
+			l.Warnf("exiting before loop %v", nLoops)
 			break
 		}
 
 		// Get next entries and have the ui schedule alerts.
 		if err := lister.Fetch(ctx); err != nil {
 			nFailures++
-			log.Printf("failure %v: cannot fetch next calendar entries: %v", nFailures, err)
+			l.Warnf("failure %v: cannot fetch next calendar entries: %v", nFailures, err)
 			if nFailures >= *failuresFlag {
-				log.Fatalf("%v consecutive failures, giving up", nFailures)
+				l.Fatalf("%v consecutive failures, giving up", nFailures)
 			}
 			time.Sleep(time.Second * 5)
 			continue

@@ -4,13 +4,13 @@ package ui
 import (
 	"bytes"
 	"fmt"
-	"log"
 	"os/exec"
 	"text/template"
 	"time"
 
 	"github.com/KarelKubat/goto-meet/cache"
 	"github.com/KarelKubat/goto-meet/item"
+	"github.com/KarelKubat/goto-meet/l"
 )
 
 // The name, system command and corresponding template for a notification.
@@ -71,7 +71,7 @@ func New(opts *Opts) (*Notifier, error) {
 	availableNotificationTypes := []string{}
 	for _, config := range notificationConfig {
 		if config.name == opts.Name {
-			log.Printf("notifier %q created to alert %v before event start", opts.Name, opts.StartsIn)
+			l.Infof("notifier %q created to alert %v before event start", opts.Name, opts.StartsIn)
 			return &Notifier{
 				config:    config,
 				opts:      opts,
@@ -101,14 +101,14 @@ func (n *Notifier) Schedule(it *item.Item) {
 	}
 
 	go func(it *item.Item) {
-		log.Printf("notification in %v for event %v", waitTime, it)
+		l.Infof("notification in %v for event %v", waitTime, it)
 		time.Sleep(waitTime)
 
 		// We've woken up and it's time to show a notification. In the meantime the laptop might have
 		// gone to sleep and woken up way past the the starttime of the event - in which case we just return.
 		// We accept an up-to 10min too late notification.
 		if time.Now().After(it.Start.Add(time.Minute * 10)) {
-			log.Printf("skipping notifiying for %v, it's too much in the past", it)
+			l.Infof("skipping notifiying for %v, it's too much in the past", it)
 			return
 		}
 
@@ -121,26 +121,26 @@ func (n *Notifier) Schedule(it *item.Item) {
 		}
 		buf := new(bytes.Buffer)
 		if err := n.config.tpl.Execute(buf, t); err != nil {
-			log.Printf("WARNING: cannot execute template: %v", err)
+			l.Warnf("cannot execute template: %v", err)
 			return
 		}
-		log.Printf("template: %v", buf.String())
+		l.Infof("template: %v", buf.String())
 		cmd := exec.Command(n.config.args[0], n.config.args[1:]...)
 		stdin, err := cmd.StdinPipe()
 		if err != nil {
-			log.Printf("WARNING: cannot create pipe to notifier: %v", err)
+			l.Warnf("cannot create pipe to notifier: %v", err)
 			return
 		}
 		go func() {
 			defer stdin.Close()
 			_, err := stdin.Write(buf.Bytes())
 			if err != nil {
-				log.Printf("WARNING: failed to write to notifier: %v", err)
+				l.Warnf("failed to write to notifier: %v", err)
 			}
 		}()
 		out, err := cmd.CombinedOutput()
 		if err != nil {
-			log.Printf("WARNING: notifier failed, output: %v, error: %v", string(out), err)
+			l.Warnf("notifier failed, output: %v, error: %v", string(out), err)
 			return
 		}
 	}(it)
@@ -151,13 +151,13 @@ func (n *Notifier) shouldSchedule(it *item.Item) (bool, time.Duration) {
 	waitTime := it.StartsIn - n.opts.StartsIn
 	switch {
 	case waitTime < 0:
-		log.Printf("%q starts in the past, not worthy scheduling; start: %v", it.Title, it.Start)
+		l.Infof("%q starts in the past, not worthy scheduling; start: %v", it.Title, it.Start)
 		return false, waitTime
 	case it.JoinLink == "":
-		log.Printf("%v has no join link, not worthy scheduling; entry: %v", it, it.Event)
+		l.Infof("%v has no join link, not worthy scheduling; entry: %v", it, it.Event)
 		return false, waitTime
 	case n.processed.Lookup(it):
-		log.Printf("%v already processed, not worthy (re)scheduling", it)
+		l.Infof("%v already processed, not worthy (re)scheduling", it)
 		return false, waitTime
 	default:
 		return true, waitTime

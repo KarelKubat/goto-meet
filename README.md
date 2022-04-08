@@ -19,20 +19,10 @@ You'll need a Go compiler and support to build your own binary.
 
 - Download the `goto-meet` sources. Use `git clone` or fetch the sources as a zip or as a `.tar.gz` file from the distributions.
 - Review the sources if you want to check that `goto-meet` doesn't do anything malicious.
-- In the downloaded location, run `go mod init`
-- Fetch required libraries:
-
-```shell
-go get -u google.golang.org/api/calendar/v3
-go get -u golang.org/x/oauth2/google
-```
-
-```shell
-go build goto-meet.go              # build the binary goto-meet
-sudo mv goto-meet /usr/local/bin/  # or use another appropriate location along your $PATH
-```
-
-If you're OK with `/usr/local/bin`, you can just run `make install` or even `make reload`, see the `Makefile`.
+- In the downloaded location, run `go mod download` to fetch required libraries.
+- To make a binary, run `go build goto-meet.go`.
+- To manually install it into say `/usr/local/bin/`, run `sudo mv goto-meet /usr/local/bin/`.
+- If you're OK with `/usr/local/bin`, you can just run `make install` or even `make reload`, see the `Makefile`.
 
 ### Option 2: Using a pre-built release
 
@@ -155,7 +145,7 @@ Use `--credentials` and `--token` to point `goto-meet` to different files than `
 
 ### Debugging
 
-`goto-meet` writes its actions to a logfile, which is by default `/tmp/goto-meet.log`. Each time that `goto-meet` starts, the log is overwritten. Use this flag to change the logfile location, or use `--log=''` to see the log in the terminal.
+`goto-meet` writes its actions to a logfile, which is by default stdout. Use this flag to change the logfile location. Typically you'll want a name consisting of `file://` and the actual path, e.g., `file:///tmp/goto-meet.log` (note that now you need 3 slashes). See https://github.com/KarelKubat/smartlog for the naming convention: using `smartlog` you can e.g. forward log statements via the network.
 
 ## Automatic startup
 

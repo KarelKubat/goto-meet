@@ -5,10 +5,10 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"log"
 	"time"
 
 	"github.com/KarelKubat/goto-meet/item"
+	"github.com/KarelKubat/goto-meet/l"
 
 	"google.golang.org/api/calendar/v3"
 )
@@ -69,22 +69,22 @@ func New(ctx context.Context, opts *Opts) (*Lister, error) {
 		}
 	}
 
-	log.Printf("calendar lister will look ahead %v and fetch max %v entries each run", opts.LookAhead, opts.MaxResultsPerPoll)
+	l.Infof("calendar lister will look ahead %v and fetch max %v entries each run", opts.LookAhead, opts.MaxResultsPerPoll)
 	return &Lister{
 		opts: opts,
 	}, nil
 }
 
 // Fetch polls for pending items and populates the list to process.
-func (l *Lister) Fetch(ctx context.Context) error {
+func (lis *Lister) Fetch(ctx context.Context) error {
 	timeMin := time.Now().Format(time.RFC3339)
-	timeMax := time.Now().Add(l.opts.LookAhead).Format(time.RFC3339)
+	timeMax := time.Now().Add(lis.opts.LookAhead).Format(time.RFC3339)
 
-	l.list = &List{}
-	for _, calendar := range l.opts.Calendars {
-		events, err := l.opts.Service.Events.
+	lis.list = &List{}
+	for _, calendar := range lis.opts.Calendars {
+		events, err := lis.opts.Service.Events.
 			List(calendar).
-			MaxResults(int64(l.opts.MaxResultsPerPoll)).
+			MaxResults(int64(lis.opts.MaxResultsPerPoll)).
 			ShowDeleted(false).
 			Context(ctx).
 			SingleEvents(true).
@@ -94,16 +94,16 @@ func (l *Lister) Fetch(ctx context.Context) error {
 			Do()
 		// TODO: skip not fully accepted entries where the user is a "maybe"
 		if err != nil {
-			return fmt.Errorf("unable to retrieve next %v events for calendar %q: %v", l.opts.MaxResultsPerPoll, calendar, err)
+			return fmt.Errorf("unable to retrieve next %v events for calendar %q: %v", lis.opts.MaxResultsPerPoll, calendar, err)
 		}
 		for _, it := range events.Items {
 			i, err := item.New(it)
 			if err != nil {
 				return fmt.Errorf("cannot initialize calendar item: %v", err)
 			}
-			l.list.Items = append(l.list.Items, i)
+			lis.list.Items = append(lis.list.Items, i)
 		}
-		log.Printf("calendar %v: %v upcoming events", calendar, len(l.list.Items))
+		l.Infof("calendar %v: %v upcoming events", calendar, len(lis.list.Items))
 	}
 
 	return nil

@@ -3,10 +3,10 @@ package cache
 
 import (
 	"fmt"
-	"log"
 	"time"
 
 	"github.com/KarelKubat/goto-meet/item"
+	"github.com/KarelKubat/goto-meet/l"
 )
 
 // Cache is the receiver that wraps necessary data.
@@ -27,7 +27,7 @@ func (c *Cache) Lookup(it *item.Item) bool {
 	if _, ok := c.m[k]; ok {
 		return true
 	}
-	log.Printf("notification added to cache: %v", it)
+	l.Infof("notification added to cache: %v", it)
 	c.m[k] = it
 	return false
 }
@@ -37,7 +37,7 @@ func (c *Cache) Weed() {
 	now := time.Now()
 	for k, it := range c.m {
 		if it.Start.Before(now) {
-			log.Printf("notification removed from cache: %v (it's in the past)", it)
+			l.Infof("notification removed from cache: %v (it's in the past)", it)
 			delete(c.m, k)
 		}
 	}

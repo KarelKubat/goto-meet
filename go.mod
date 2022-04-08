@@ -9,6 +9,7 @@ require (
 
 require (
 	cloud.google.com/go v0.94.1 // indirect
+	github.com/KarelKubat/smartlog v0.0.0-20220217170303-f758d9861125 // indirect
 	github.com/golang/groupcache v0.0.0-20200121045136-8c9f03a8e57e // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/googleapis/gax-go/v2 v2.1.1 // indirect

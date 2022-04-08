@@ -7,9 +7,10 @@ import (
 	"errors"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"os"
 	"time"
+
+	"github.com/KarelKubat/goto-meet/l"
 
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/google"
@@ -36,7 +37,7 @@ func New(ctx context.Context, opts *Opts) (*calendar.Service, error) {
 	if err != nil {
 		return nil, fmt.Errorf("cannot read %q", opts.CredentialsFile)
 	}
-	log.Printf("credentials file %q scannned", opts.CredentialsFile)
+	l.Infof("credentials file %q scannned", opts.CredentialsFile)
 	config, err := google.ConfigFromJSON(b, calendar.CalendarReadonlyScope)
 	if err != nil {
 		return nil, fmt.Errorf("cannot instantiate configuration: %v", err)
@@ -49,9 +50,9 @@ func New(ctx context.Context, opts *Opts) (*calendar.Service, error) {
 		return nil, fmt.Errorf("cannot read token file: %v", err)
 	}
 	if haveTokenFile {
-		log.Printf("token file %q scanned", opts.TokenFile)
+		l.Infof("token file %q scanned", opts.TokenFile)
 	} else {
-		log.Printf("token file %q not found, fetching from web", opts.TokenFile)
+		l.Infof("token file %q not found, fetching from web", opts.TokenFile)
 		if tok, err = getTokenFromWeb(ctx, config); err != nil {
 			return nil, fmt.Errorf("cannot read web token: %v", err)
 		}
@@ -63,10 +64,9 @@ func New(ctx context.Context, opts *Opts) (*calendar.Service, error) {
 	// Instantiate a service connector.
 	httpClient := config.Client(ctx, tok)
 	httpClient.Timeout = opts.Timeout
-	// log.Printf("HTTP client: %+v", *httpClient)
 	srv, err := calendar.NewService(ctx, option.WithHTTPClient(httpClient))
 	if err != nil {
-		return nil, fmt.Errorf("cannot connecto to calendar service: %v", err)
+		return nil, fmt.Errorf("cannot connect to calendar service: %v", err)
 	}
 	return srv, nil
 }
