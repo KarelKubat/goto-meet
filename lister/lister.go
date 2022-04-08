@@ -8,7 +8,7 @@ import (
 	"log"
 	"time"
 
-	"goto-meet/item"
+	"github.com/KarelKubat/goto-meet/item"
 
 	"google.golang.org/api/calendar/v3"
 )

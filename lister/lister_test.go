@@ -1,8 +1,9 @@
 package lister
 
 import (
-	"goto-meet/item"
 	"testing"
+
+	"github.com/KarelKubat/goto-meet/item"
 )
 
 func TestFirstNext(t *testing.T) {

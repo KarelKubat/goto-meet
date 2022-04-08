@@ -1,11 +1,12 @@
 package ui
 
 import (
-	"goto-meet/cache"
-	"goto-meet/item"
 	"strings"
 	"testing"
 	"time"
+
+	"github.com/KarelKubat/goto-meet/cache"
+	"github.com/KarelKubat/goto-meet/item"
 )
 
 func TestNew(t *testing.T) {

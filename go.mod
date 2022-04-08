@@ -1,4 +1,4 @@
-module goto-meet
+module github.com/KarelKubat/goto-meet
 
 go 1.17
 

@@ -6,7 +6,7 @@ import (
 	"log"
 	"time"
 
-	"goto-meet/item"
+	"github.com/KarelKubat/goto-meet/item"
 )
 
 // Cache is the receiver that wraps necessary data.

@@ -2,9 +2,10 @@ package cache
 
 import (
 	"fmt"
-	"goto-meet/item"
 	"testing"
 	"time"
+
+	"github.com/KarelKubat/goto-meet/item"
 )
 
 func TestItemKey(t *testing.T) {

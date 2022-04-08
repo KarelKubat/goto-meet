@@ -217,4 +217,5 @@ Thanks!
 0.04 2021-11 Extra check before rendering an alert, to avoid time dislocations due to laptop sleeps.
 0.05 2022-01 Positional CLI arguments disallowed, README fixes, misc small changes.
 0.06 2022-01 Bugfix when polling multiple calendars.
+0.07 2022-04 Package renamed to full github path.
 ```

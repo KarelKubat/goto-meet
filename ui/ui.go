@@ -9,8 +9,8 @@ import (
 	"text/template"
 	"time"
 
-	"goto-meet/cache"
-	"goto-meet/item"
+	"github.com/KarelKubat/goto-meet/cache"
+	"github.com/KarelKubat/goto-meet/item"
 )
 
 // The name, system command and corresponding template for a notification.

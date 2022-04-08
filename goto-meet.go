@@ -9,15 +9,15 @@ import (
 	"strings"
 	"time"
 
-	"goto-meet/client"
-	"goto-meet/lib"
-	"goto-meet/lister"
-	"goto-meet/ui"
+	"github.com/KarelKubat/goto-meet/client"
+	"github.com/KarelKubat/goto-meet/lib"
+	"github.com/KarelKubat/goto-meet/lister"
+	"github.com/KarelKubat/goto-meet/ui"
 )
 
 const (
 	// Version of this package, increased upon releasing.
-	version = "0.06"
+	version = "0.07"
 )
 
 var (

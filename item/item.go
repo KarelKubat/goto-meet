@@ -7,7 +7,7 @@ import (
 	"regexp"
 	"time"
 
-	"goto-meet/lib"
+	"github.com/KarelKubat/goto-meet/lib"
 
 	"google.golang.org/api/calendar/v3"
 )
