@@ -17,7 +17,7 @@ import (
 
 const (
 	// Version of this package, increased upon releasing.
-	version = "0.07"
+	version = "0.08"
 )
 
 var (
@@ -41,7 +41,7 @@ var (
 	// General
 	loopsFlag    = flag.Int("loops", 0, "polling loops to execute before stopping, 0 means forever (mainly for debugging)")
 	failuresFlag = flag.Int("failures", 10, "give up after # of consecutive polling errors")
-	logfileFlag  = flag.String("log", "file://stdout", "logfile, see https://github.com/KarelKubat/smartlog")
+	logFlag      = flag.String("log", "file://stdout", "logfile, see https://github.com/KarelKubat/smartlog")
 	versionFlag  = flag.Bool("version", false, "show version and stop")
 )
 
@@ -56,7 +56,10 @@ func main() {
 		os.Exit(0)
 	}
 
-	l.SetOutput(*logfileFlag)
+	if err := l.SetOutput(*logFlag); err != nil {
+		fmt.Fprintf(os.Stderr, "cannot set log destination: %v\n", err)
+		os.Exit(1)
+	}
 	l.Infof("Welcome to goto-meet %v", version)
 
 	tokenPath, err := lib.ExpandPath(*tokenFileFlag)
