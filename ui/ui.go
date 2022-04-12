@@ -13,6 +13,11 @@ import (
 	"github.com/KarelKubat/goto-meet/l"
 )
 
+const (
+	// Interval between clock skew checks
+	heartbeatInterval = time.Second * 10
+)
+
 // The name, system command and corresponding template for a notification.
 type notificationSettings struct {
 	name string
@@ -21,6 +26,8 @@ type notificationSettings struct {
 }
 
 var (
+	// UI notifications. Use {{.Browser}} and so on to fill in. The `args`
+	// program will be called with the expanded `tpl` on stdin.
 	notificationConfig = []*notificationSettings{
 		{
 			name: "macos_osascript",
@@ -53,17 +60,17 @@ end if
 
 // Opts wraps the options to create a notifier.
 type Opts struct {
-	Name          string
-	StartsIn      time.Duration
-	VisibilitySec int
-	Browser       string
+	Name          string        // Name of this notifier
+	StartsIn      time.Duration // Duration before the event to render the UI
+	VisibilitySec int           // How long the UI should stay visible
+	Browser       string        // Browser to call upon "join"
 }
 
 // Notifier wraps the applicable notification configuration.
 type Notifier struct {
-	opts      *Opts                 // name, lead time etc. to show an alert before a meeting starts
-	config    *notificationSettings // one of the notificationConfigs
-	processed *cache.Cache          // has an event been processed yet?
+	opts      *Opts                 // Name, lead time etc. to show an alert before a meeting starts
+	config    *notificationSettings // One of the notificationConfigs
+	processed *cache.Cache          // Has an event been processed yet?
 }
 
 // New creates a Notifier.
@@ -71,15 +78,31 @@ func New(opts *Opts) (*Notifier, error) {
 	availableNotificationTypes := []string{}
 	for _, config := range notificationConfig {
 		if config.name == opts.Name {
-			l.Infof("notifier %q created to alert %v before event start", opts.Name, opts.StartsIn)
-			return &Notifier{
+			// Matched the requested UI notifier.
+			out := &Notifier{
 				config:    config,
 				opts:      opts,
 				processed: cache.New(),
-			}, nil
+			}
+			// Start the heartbeat to remove cached entries when a clock skew is detected.
+			go func() {
+				for {
+					start := time.Now()
+					time.Sleep(heartbeatInterval)
+					// Unconsciousness for more than 1 second will be detected.
+					if time.Now().After(start.Add(heartbeatInterval + time.Second)) {
+						l.Infof("time skew detected")
+						out.processed.Clear()
+					}
+				}
+			}()
+			l.Infof("notifier %q created to alert %v before event start", opts.Name, opts.StartsIn)
+			return out, nil
 		}
 		availableNotificationTypes = append(availableNotificationTypes, config.name)
 	}
+
+	// No handler found for the requested UI notifier.
 	return nil, fmt.Errorf("no such notification type %q, choose one of %v", opts.Name, availableNotificationTypes)
 }
 
@@ -106,8 +129,10 @@ func (n *Notifier) Schedule(it *item.Item) {
 
 		// We've woken up and it's time to show a notification. In the meantime the laptop might have
 		// gone to sleep and woken up way past the the starttime of the event - in which case we just return.
-		// We accept an up-to 10min too late notification.
-		if time.Now().After(it.Start.Add(time.Minute * 10)) {
+		//
+		// Fortunately there's a heartbeat that detects clock skew and clears the cache, so that events are
+		// re-scheduled into another go-routine. So this event notifier may fail, there will be a backup.
+		if time.Now().After(it.Start.Add(time.Second)) {
 			l.Infof("skipping notifiying for %v, it's too much in the past", it)
 			return
 		}
