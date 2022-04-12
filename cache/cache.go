@@ -3,6 +3,7 @@ package cache
 
 import (
 	"fmt"
+	"sync"
 	"time"
 
 	"github.com/KarelKubat/goto-meet/item"
@@ -11,7 +12,8 @@ import (
 
 // Cache is the receiver that wraps necessary data.
 type Cache struct {
-	m map[string]*item.Item
+	m  map[string]*item.Item
+	mu sync.Mutex
 }
 
 // New returns an initialized cache.
@@ -23,6 +25,9 @@ func New() *Cache {
 
 // Lookup returns true when an item was previously stored. When not, the item is stored and false is returned.
 func (c *Cache) Lookup(it *item.Item) bool {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+
 	k := itemKey(it)
 	if _, ok := c.m[k]; ok {
 		return true
@@ -34,6 +39,9 @@ func (c *Cache) Lookup(it *item.Item) bool {
 
 // Weed removes items with timestamps in the past. These don't have to be kept in memory.
 func (c *Cache) Weed() {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+
 	now := time.Now()
 	for k, it := range c.m {
 		if it.Start.Before(now) {
@@ -41,6 +49,15 @@ func (c *Cache) Weed() {
 			delete(c.m, k)
 		}
 	}
+}
+
+// Clear removes all entries from the cache.
+func (c *Cache) Clear() {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+
+	l.Infof("clearing cache")
+	c.m = map[string]*item.Item{}
 }
 
 // itemKey is a helper to derive a distinctive key for an item.
