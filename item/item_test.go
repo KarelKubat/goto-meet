@@ -30,6 +30,10 @@ func TestFindJoinLink(t *testing.T) {
 			wantJoinLink: "https://liveplayer.corp.google.com/what/ever",
 		},
 		{
+			summary:      `<a href="http://go/cp-sre-townhall-livestream" id="ow3404" __is_owner="true">Livestream</a>`,
+			wantJoinLink: "http://go/cp-sre-townhall-livestream",
+		},
+		{
 			// Descriptions are examined for patterns
 			description:  `<a href="https://stream.meet.google.com/what/ever">`,
 			wantJoinLink: "https://stream.meet.google.com/what/ever",
