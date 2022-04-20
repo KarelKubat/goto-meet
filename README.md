@@ -210,4 +210,5 @@ Thanks!
 0.07 2022-04 Package renamed to full github path.
 0.08 2022-04 Logging switched to github.com/KarelKubat/smartlog.
 0.09 2022-04 Heartbeat and clock skew detection implemented.
+0.10 2022-04 Support for livestream links.
 ```
