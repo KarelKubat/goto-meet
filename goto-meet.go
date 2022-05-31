@@ -17,7 +17,7 @@ import (
 
 const (
 	// Version of this package, increased upon releasing.
-	version = "0.10"
+	version = "0.11"
 )
 
 var (
