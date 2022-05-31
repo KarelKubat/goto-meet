@@ -103,6 +103,7 @@ func (i *Item) findStart() error {
 		return errors.New("cannot find event start")
 	}
 	i.StartsIn = i.Start.Sub(time.Now())
+	fmt.Println("item start:", i.Start, "now:", time.Now(), "startsIn:", i.StartsIn)
 
 	return nil
 }

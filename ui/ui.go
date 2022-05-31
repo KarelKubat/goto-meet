@@ -173,18 +173,17 @@ func (n *Notifier) Schedule(it *item.Item) {
 
 // shouldSchedule is a helper to determine whether an item is worthy of scheduling.
 func (n *Notifier) shouldSchedule(it *item.Item) (bool, time.Duration) {
-	waitTime := it.StartsIn - n.opts.StartsIn
 	switch {
-	case waitTime < 0:
+	case it.StartsIn < 0:
 		l.Infof("%q starts in the past, not worthy scheduling; start: %v", it.Title, it.Start)
-		return false, waitTime
+		return false, 0
 	case it.JoinLink == "":
 		l.Infof("%v has no join link, not worthy scheduling; entry: %v", it, it.Event)
-		return false, waitTime
+		return false, 0
 	case n.processed.Lookup(it):
 		l.Infof("%v already processed, not worthy (re)scheduling", it)
-		return false, waitTime
+		return false, 0
 	default:
-		return true, waitTime
+		return true, it.StartsIn - n.opts.StartsIn
 	}
 }
